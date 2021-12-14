@@ -342,7 +342,7 @@ class StoryBoardController {
     return ErrorWidget.builder(details);
   }
 
-  void registerService() {
+  static void registerService() {
     GetIt.instance.allowReassignment = true;
     GetIt.instance.registerLazySingleton<ClockService>(() => ClockService());
   }
