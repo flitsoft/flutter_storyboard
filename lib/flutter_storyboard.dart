@@ -1,3 +1,5 @@
+library flutter_storyboard;
+
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
