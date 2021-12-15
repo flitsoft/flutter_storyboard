@@ -116,7 +116,7 @@ class StoryBoardController {
     print("$logTrace");
 
     if (isCI()) {
-      StoryboardGraph? _graphForCiAuto = view.widget.graphForStoryboard;
+      StoryboardGraph? _graphForCiAuto = view.widget.graphForCiAuto;
       if (_graphForCiAuto == null) return;
       await recurse(_graphForCiAuto);
     } else {
@@ -242,9 +242,9 @@ class StoryBoardController {
     final bytes = await img.toByteData(format: ImageByteFormat.png);
     if (bytes == null) return;
     final byteList = bytes.buffer.asUint8List();
-    print(
-        "Storyboard: ${view.widget.graphForCiAuto?.relationDescription ?? "graphForCiAuto is null"}");
     if (isCI()) {
+      print(
+          "Storyboard: ${view.widget.graphForCiAuto?.relationDescription ?? "graphForCiAuto is null"}");
       await _uploadAndDownloadUrlText(byteList);
       // final unawaited = _downloadImage(byteList);
       Navigator.of(view.context).pop();
