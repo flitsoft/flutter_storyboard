@@ -8,6 +8,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_storyboard/src/storyboard_controller.dart';
 import 'package:flutter_storyboard/src/storyboard_model.dart';
+import 'package:flutter_storyboard/src/utils/devuce_preview/device_preview.dart';
 import 'package:flutter_storyboard/src/utils/gesture_visualizer.dart';
 import 'package:flutter_storyboard/src/utils/screenshotable.dart';
 import 'package:flutter_storyboard/src/utils/static_utils.dart';
@@ -183,7 +184,9 @@ class StoryBoardState extends State<StoryBoard> {
   }
 
   Widget _getSpotLight() {
-    final device = Devices.android.samsungS8;
+    //Novaiko ho device sasmungNOte10plus ilay samsung 8 satria kely loatra
+    // ilay ecran dia tsy mety cliker na sady lasa simba ilay width amin ecran
+    final device = Devices.android.samsungNote10Plus;
 
     final bounds = device.screenPath.getBounds();
 
@@ -201,85 +204,89 @@ class StoryBoardState extends State<StoryBoard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            clipBehavior: Clip.hardEdge,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(),
-            ),
-            height: height,
-            width: width,
-            child: true
-                ? ScreenShotable(
-                    screenshotController: controller.spotLightScreenshotCtrl,
-                    child: GestureVisualizer(
-                      child: DeviceFrame(
-                        device: device,
-                        isFrameVisible: true,
-                        screen: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            border: Border.all(),
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(),
+              ),
+              height: height,
+              width: width,
+              child: false
+                  ? ScreenShotable(
+                      screenshotController: controller.spotLightScreenshotCtrl,
+                      child: GestureVisualizer(
+                        child: DeviceFrame(
+                          device: device,
+                          isFrameVisible: true,
+                          screen: Container(
+                            height: device.screenSize.height,
+                            width: device.screenSize.width,
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              border: Border.all(),
+                            ),
+                            child: controller.spotLight,
                           ),
-                          child: controller.spotLight,
                         ),
                       ),
-                    ),
-                  )
-                : DevicePreview(
-                    enabled: true,
-                    isToolbarVisible: false,
-                    data: DevicePreviewData(
-                      isFrameVisible: false,
-                      isToolbarVisible: false,
-                    ),
-                    defaultDevice: device,
-                    builder: (context) {
-                      final ctxDevicePixelRatio =
-                          MediaQuery.of(context).devicePixelRatio;
-                      final windowDevicePixelRation =
-                          ui.window.devicePixelRatio;
-                      final ctxSize = MediaQuery.of(context).size;
-                      final uiSize = ui.window.physicalSize;
-                      final ctxTextScale =
-                          MediaQuery.of(context).textScaleFactor;
-                      final uiCtxTextScale = ui.window.textScaleFactor;
-                      final uiPadding = ui.window.padding;
-                      final ctxPadding = MediaQuery.of(context).padding;
-                      final ctxViewPadding = MediaQuery.of(context).viewPadding;
-                      final ctxViewInsets = MediaQuery.of(context).viewInsets;
-                      final uiViewPadding = ui.window.viewPadding;
-                      final uiViewInsets = ui.window.viewInsets;
+                    )
+                  : ScreenShotable(
+                      screenshotController: controller.spotLightScreenshotCtrl,
+                      child: GestureVisualizer(
+                        child: MyDevicePreview(
+                          enabled: true,
+                          isToolbarVisible: false,
+                          defaultDevice: device,
+                          builder: (context) {
+                            final ctxDevicePixelRatio =
+                                MediaQuery.of(context).devicePixelRatio;
+                            final windowDevicePixelRation =
+                                ui.window.devicePixelRatio;
+                            final ctxSize = MediaQuery.of(context).size;
+                            final uiSize = ui.window.physicalSize;
+                            final ctxTextScale =
+                                MediaQuery.of(context).textScaleFactor;
+                            final uiCtxTextScale = ui.window.textScaleFactor;
+                            final uiPadding = ui.window.padding;
+                            final ctxPadding = MediaQuery.of(context).padding;
+                            final ctxViewPadding =
+                                MediaQuery.of(context).viewPadding;
+                            final ctxViewInsets =
+                                MediaQuery.of(context).viewInsets;
+                            final uiViewPadding = ui.window.viewPadding;
+                            final uiViewInsets = ui.window.viewInsets;
 
-                      final config = {
-                        'ctxDevicePixelRatio': ctxDevicePixelRatio,
-                        'windowDevicePixelRation': windowDevicePixelRation,
-                        'ctxSize': ctxSize,
-                        'uiSize': uiSize,
-                        'ctxTextScale': ctxTextScale,
-                        'uiCtxTextScale': uiCtxTextScale,
-                        'uiPadding': uiPadding,
-                        'ctxPadding': ctxPadding,
-                        'ctxViewPadding': ctxViewPadding,
-                        'ctxViewInsets': ctxViewInsets,
-                        'uiViewPadding': uiViewPadding,
-                        'uiViewInsets': uiViewInsets,
-                      };
-                      print(config);
-
-                      return ScreenShotable(
-                        screenshotController:
-                            controller.spotLightScreenshotCtrl,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            border: Border.all(),
-                          ),
-                          child: controller.spotLight,
+                            final config = {
+                              'ctxDevicePixelRatio': ctxDevicePixelRatio,
+                              'windowDevicePixelRation':
+                                  windowDevicePixelRation,
+                              'ctxSize': ctxSize,
+                              'uiSize': uiSize,
+                              'ctxTextScale': ctxTextScale,
+                              'uiCtxTextScale': uiCtxTextScale,
+                              'uiPadding': uiPadding,
+                              'ctxPadding': ctxPadding,
+                              'ctxViewPadding': ctxViewPadding,
+                              'ctxViewInsets': ctxViewInsets,
+                              'uiViewPadding': uiViewPadding,
+                              'uiViewInsets': uiViewInsets,
+                            };
+                            print(config);
+                            return DeviceFrame(
+                              device: device,
+                              isFrameVisible: false,
+                              screen: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  border: Border.all(),
+                                ),
+                                child: controller.spotLight,
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
-          ),
+                      ),
+                    )),
           Container(
             width: width,
             color: Colors.green,

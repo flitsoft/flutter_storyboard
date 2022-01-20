@@ -82,6 +82,7 @@ class StoryBoardController {
 
   bool spotLightVisible = true;
   bool showFlowInPullRequest = false;
+  static bool isStoryBoard = false;
 
   void attach(StoryBoardState storyBoardState) {
     this.view = storyBoardState;
