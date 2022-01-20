@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_storyboard/src/choose_storyboard/choose_storyboard_page.dart';
 import 'package:flutter_storyboard/src/storyboard_model.dart';
@@ -82,9 +83,19 @@ class StoryBoardController {
 
   bool spotLightVisible = true;
   bool showFlowInPullRequest = false;
+  static bool isStoryBoard = false;
+  static bool flitWeb = true;
 
   void attach(StoryBoardState storyBoardState) {
     this.view = storyBoardState;
+  }
+
+  static bool myWebFoundation() {
+    bool isFlitWeb = kIsWeb;
+    if (StoryBoardController.isStoryBoard) {
+      isFlitWeb = flitWeb;
+    }
+    return isFlitWeb;
   }
 
   void toggle() {

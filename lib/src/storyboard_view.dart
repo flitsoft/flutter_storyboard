@@ -8,6 +8,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_storyboard/src/storyboard_controller.dart';
 import 'package:flutter_storyboard/src/storyboard_model.dart';
+import 'package:flutter_storyboard/src/utils/device_preview/device_preview.dart';
 import 'package:flutter_storyboard/src/utils/gesture_visualizer.dart';
 import 'package:flutter_storyboard/src/utils/screenshotable.dart';
 import 'package:flutter_storyboard/src/utils/static_utils.dart';
@@ -182,6 +183,20 @@ class StoryBoardState extends State<StoryBoard> {
     setState(() {});
   }
 
+  /**
+      To have an interactive map, it needs to be 100% scaled.
+      DevicePreview is using css transform for scaling everything up or down,
+      including the map. However,  the map is showing weird bugs if transformed
+      ( map edges loading late, map gestures not correctly recognised)
+      There is a git issue about that (link to add here) and the solution was
+      to suggest that no one scale transform map, people just resize the map.
+      As a result,  we have to use full scale map, but DevicePreview adds a
+      margin (grey background) to the Device frame and scale down the map.
+      We could play around with the size to compensate for this margin to
+      make the map 100%, but the best solution is to use DeviceFrame,
+      which is used by DevicePreview. DeviceFrame does not have this margin,
+      hence, map is at 100%
+   ***/
   Widget _getSpotLight() {
     final device = Devices.android.samsungS8;
 
@@ -189,9 +204,12 @@ class StoryBoardState extends State<StoryBoard> {
 
     final scale = bounds.width / device.screenSize.width;
 
-    final height = kIsWeb ? device.frameSize.height / scale : screenheight;
-    final width = kIsWeb ? device.frameSize.width / scale : screenwidth;
-
+    final height = StoryBoardController.myWebFoundation()
+        ? device.frameSize.height / scale
+        : screenheight;
+    final width = StoryBoardController.myWebFoundation()
+        ? device.frameSize.width / scale
+        : screenwidth;
     return Visibility(
       maintainSize: true,
       maintainAnimation: true,
@@ -201,85 +219,89 @@ class StoryBoardState extends State<StoryBoard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            clipBehavior: Clip.hardEdge,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(),
-            ),
-            height: height,
-            width: width,
-            child: true
-                ? ScreenShotable(
-                    screenshotController: controller.spotLightScreenshotCtrl,
-                    child: GestureVisualizer(
-                      child: DeviceFrame(
-                        device: device,
-                        isFrameVisible: true,
-                        screen: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            border: Border.all(),
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(),
+              ),
+              height: height,
+              width: width,
+              child: false
+                  ? ScreenShotable(
+                      screenshotController: controller.spotLightScreenshotCtrl,
+                      child: GestureVisualizer(
+                        child: DeviceFrame(
+                          device: device,
+                          isFrameVisible: true,
+                          screen: Container(
+                            height: device.screenSize.height,
+                            width: device.screenSize.width,
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              border: Border.all(),
+                            ),
+                            child: controller.spotLight,
                           ),
-                          child: controller.spotLight,
                         ),
                       ),
-                    ),
-                  )
-                : DevicePreview(
-                    enabled: true,
-                    isToolbarVisible: false,
-                    data: DevicePreviewData(
-                      isFrameVisible: false,
-                      isToolbarVisible: false,
-                    ),
-                    defaultDevice: device,
-                    builder: (context) {
-                      final ctxDevicePixelRatio =
-                          MediaQuery.of(context).devicePixelRatio;
-                      final windowDevicePixelRation =
-                          ui.window.devicePixelRatio;
-                      final ctxSize = MediaQuery.of(context).size;
-                      final uiSize = ui.window.physicalSize;
-                      final ctxTextScale =
-                          MediaQuery.of(context).textScaleFactor;
-                      final uiCtxTextScale = ui.window.textScaleFactor;
-                      final uiPadding = ui.window.padding;
-                      final ctxPadding = MediaQuery.of(context).padding;
-                      final ctxViewPadding = MediaQuery.of(context).viewPadding;
-                      final ctxViewInsets = MediaQuery.of(context).viewInsets;
-                      final uiViewPadding = ui.window.viewPadding;
-                      final uiViewInsets = ui.window.viewInsets;
+                    )
+                  : ScreenShotable(
+                      screenshotController: controller.spotLightScreenshotCtrl,
+                      child: GestureVisualizer(
+                        child: MyDevicePreview(
+                          enabled: true,
+                          isToolbarVisible: false,
+                          defaultDevice: device,
+                          builder: (context) {
+                            final ctxDevicePixelRatio =
+                                MediaQuery.of(context).devicePixelRatio;
+                            final windowDevicePixelRation =
+                                ui.window.devicePixelRatio;
+                            final ctxSize = MediaQuery.of(context).size;
+                            final uiSize = ui.window.physicalSize;
+                            final ctxTextScale =
+                                MediaQuery.of(context).textScaleFactor;
+                            final uiCtxTextScale = ui.window.textScaleFactor;
+                            final uiPadding = ui.window.padding;
+                            final ctxPadding = MediaQuery.of(context).padding;
+                            final ctxViewPadding =
+                                MediaQuery.of(context).viewPadding;
+                            final ctxViewInsets =
+                                MediaQuery.of(context).viewInsets;
+                            final uiViewPadding = ui.window.viewPadding;
+                            final uiViewInsets = ui.window.viewInsets;
 
-                      final config = {
-                        'ctxDevicePixelRatio': ctxDevicePixelRatio,
-                        'windowDevicePixelRation': windowDevicePixelRation,
-                        'ctxSize': ctxSize,
-                        'uiSize': uiSize,
-                        'ctxTextScale': ctxTextScale,
-                        'uiCtxTextScale': uiCtxTextScale,
-                        'uiPadding': uiPadding,
-                        'ctxPadding': ctxPadding,
-                        'ctxViewPadding': ctxViewPadding,
-                        'ctxViewInsets': ctxViewInsets,
-                        'uiViewPadding': uiViewPadding,
-                        'uiViewInsets': uiViewInsets,
-                      };
-                      print(config);
-
-                      return ScreenShotable(
-                        screenshotController:
-                            controller.spotLightScreenshotCtrl,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            border: Border.all(),
-                          ),
-                          child: controller.spotLight,
+                            final config = {
+                              'ctxDevicePixelRatio': ctxDevicePixelRatio,
+                              'windowDevicePixelRation':
+                                  windowDevicePixelRation,
+                              'ctxSize': ctxSize,
+                              'uiSize': uiSize,
+                              'ctxTextScale': ctxTextScale,
+                              'uiCtxTextScale': uiCtxTextScale,
+                              'uiPadding': uiPadding,
+                              'ctxPadding': ctxPadding,
+                              'ctxViewPadding': ctxViewPadding,
+                              'ctxViewInsets': ctxViewInsets,
+                              'uiViewPadding': uiViewPadding,
+                              'uiViewInsets': uiViewInsets,
+                            };
+                            print(config);
+                            return DeviceFrame(
+                              device: device,
+                              isFrameVisible: false,
+                              screen: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  border: Border.all(),
+                                ),
+                                child: controller.spotLight,
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
-          ),
+                      ),
+                    )),
           Container(
             width: width,
             color: Colors.green,
