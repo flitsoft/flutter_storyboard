@@ -186,7 +186,7 @@ class StoryBoardState extends State<StoryBoard> {
   Widget _getSpotLight() {
     //Novaiko ho device sasmungNOte10plus ilay samsung 8 satria kely loatra
     // ilay ecran dia tsy mety cliker na sady lasa simba ilay width amin ecran
-    final device = Devices.android.samsungNote10Plus;
+    final device = Devices.android.samsungS8;
 
     final bounds = device.screenPath.getBounds();
 

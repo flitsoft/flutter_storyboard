@@ -344,34 +344,26 @@ class _DevicePreviewState extends State<MyDevicePreview> {
       (DevicePreviewStore store) => store.data.isDarkMode,
     );
 
-    return Padding(
-      padding: EdgeInsets.only(
-        top: 20 + mediaQuery.viewPadding.top,
-        right: 20 + mediaQuery.viewPadding.right,
-        left: 20 + mediaQuery.viewPadding.left,
-        bottom: 20,
-      ),
-      child: FittedBox(
-        fit: BoxFit.contain,
-        child: RepaintBoundary(
-          key: _repaintKey,
-          child: DeviceFrame(
-            device: device,
-            isFrameVisible: isFrameVisible,
-            orientation: orientation,
-            screen: VirtualKeyboard(
-              isEnabled: isVirtualKeyboardVisible,
-              child: Theme(
-                data: Theme.of(context).copyWith(
-                  platform: device.identifier.platform,
-                  brightness: isDarkMode ? Brightness.dark : Brightness.light,
-                ),
-                child: MediaQuery(
-                  data: MyDevicePreview._mediaQuery(context),
-                  child: Builder(
-                    key: _appKey,
-                    builder: widget.builder,
-                  ),
+    return FittedBox(
+      fit: BoxFit.contain,
+      child: RepaintBoundary(
+        key: _repaintKey,
+        child: DeviceFrame(
+          device: device,
+          isFrameVisible: isFrameVisible,
+          orientation: orientation,
+          screen: VirtualKeyboard(
+            isEnabled: isVirtualKeyboardVisible,
+            child: Theme(
+              data: Theme.of(context).copyWith(
+                platform: device.identifier.platform,
+                brightness: isDarkMode ? Brightness.dark : Brightness.light,
+              ),
+              child: MediaQuery(
+                data: MyDevicePreview._mediaQuery(context),
+                child: Builder(
+                  key: _appKey,
+                  builder: widget.builder,
                 ),
               ),
             ),
