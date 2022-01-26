@@ -83,7 +83,6 @@ class StoryBoardController {
 
   bool spotLightVisible = true;
   bool showFlowInPullRequest = false;
-  static bool isStoryBoard = false;
   static bool isFlitWeb = kIsWeb;
 
   void attach(StoryBoardState storyBoardState) {
