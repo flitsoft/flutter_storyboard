@@ -182,6 +182,7 @@ class StoryBoardState extends State<StoryBoard> {
     setState(() {});
   }
 
+  //PROBLEM
   /**
       To have an interactive map, it needs to be 100% scaled.
       DevicePreview is using css transform for scaling everything up or down,
@@ -196,6 +197,9 @@ class StoryBoardState extends State<StoryBoard> {
       which is used by DevicePreview. DeviceFrame does not have this margin,
       hence, map is at 100%
    ***/
+
+  //SOLUTION
+  /// Change device preview and delete padding to display map 100%
   Widget _getSpotLight() {
     final device = Devices.android.samsungS8;
 
