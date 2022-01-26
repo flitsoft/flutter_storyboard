@@ -84,18 +84,10 @@ class StoryBoardController {
   bool spotLightVisible = true;
   bool showFlowInPullRequest = false;
   static bool isStoryBoard = false;
-  static bool flitWeb = true;
+  static bool isFlitWeb = kIsWeb;
 
   void attach(StoryBoardState storyBoardState) {
     this.view = storyBoardState;
-  }
-
-  static bool myWebFoundation() {
-    bool isFlitWeb = kIsWeb;
-    if (StoryBoardController.isStoryBoard) {
-      isFlitWeb = flitWeb;
-    }
-    return isFlitWeb;
   }
 
   void toggle() {

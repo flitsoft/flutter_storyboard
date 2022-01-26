@@ -174,7 +174,6 @@ class StoryBoardState extends State<StoryBoard> {
     // resetContainerForTest();
     super.initState();
     this.controller.attach(this);
-
     SchedulerBinding.instance
         ?.addPostFrameCallback((_) => controller.onReady());
   }
@@ -203,11 +202,10 @@ class StoryBoardState extends State<StoryBoard> {
     final bounds = device.screenPath.getBounds();
 
     final scale = bounds.width / device.screenSize.width;
-
-    final height = StoryBoardController.myWebFoundation()
+    final height = StoryBoardController.isFlitWeb
         ? device.frameSize.height / scale
         : screenheight;
-    final width = StoryBoardController.myWebFoundation()
+    final width = StoryBoardController.isFlitWeb
         ? device.frameSize.width / scale
         : screenwidth;
     return Visibility(
