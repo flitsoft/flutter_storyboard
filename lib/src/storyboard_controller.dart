@@ -230,7 +230,7 @@ class StoryBoardController {
     final answer = await uploadTask;
     final url = await answer.ref.getDownloadURL();
     print("Download URL: $url");
-    await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(Duration(seconds: 4));
     if (showFlowInPullRequest) {
       print("Download IMAGE PR: $url");
     } else {
