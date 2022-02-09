@@ -232,6 +232,8 @@ class StoryBoardController {
     print("Download URL: $url");
     if (showFlowInPullRequest) {
       print("Download IMAGE PR: $url");
+    } else {
+      print("No image in PR");
     }
     await GoogleMapsWebScreenshot.instance.downloadFile(
         """<img width="1680" alt="$fileName" src="$url">""", "url.txt");
