@@ -9,13 +9,13 @@ class StoryboardGraph {
   bool showInPullRequest;
   final BaseStoryScreen story;
   final String relationDescription;
-  final int number;
+  final String imageNumber;
   final List<StoryboardGraph> children;
 
   StoryboardGraph(
       {this.enabled = true,
       this.showInPullRequest = false,
-      this.number = 0,
+      this.imageNumber = '',
       required this.story,
       required this.relationDescription,
       required this.children});
