@@ -253,7 +253,7 @@ class StoryBoardController {
               "graphForCiAuto is null";
       String? imageNumber = view.widget.graphForCiAuto?.imageNumber == ''
           ? "imageNumber is empty"
-          : view.widget.graphForCiAuto?.imageNumber;
+          : "${view.widget.graphForCiAuto?.imageNumber} ${view.widget.graphForStoryboard?.children.length.toString()}";
       print("Storyboard: $imageNumber : $relationDescription");
       await _uploadAndDownloadUrlText(byteList);
       // final unawaited = _downloadImage(byteList);
