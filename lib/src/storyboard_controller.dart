@@ -248,8 +248,13 @@ class StoryBoardController {
     if (bytes == null) return;
     final byteList = bytes.buffer.asUint8List();
     if (isCI()) {
-      print(
-          "Storyboard: ${view.widget.graphForCiAuto?.imageNumber} : ${view.widget.graphForCiAuto?.relationDescription ?? "graphForCiAuto is null"}");
+      String relationDescription =
+          view.widget.graphForCiAuto?.relationDescription ??
+              "graphForCiAuto is null";
+      String? imageNumber = view.widget.graphForCiAuto?.imageNumber == ''
+          ? "imageNumber is empty"
+          : view.widget.graphForCiAuto?.imageNumber;
+      print("Storyboard: $imageNumber : $relationDescription");
       await _uploadAndDownloadUrlText(byteList);
       // final unawaited = _downloadImage(byteList);
       Navigator.of(view.context).pop();
