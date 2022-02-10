@@ -84,15 +84,14 @@ class StoryBoardController {
   bool spotLightVisible = true;
   bool showFlowInPullRequest = false;
   static bool isFlitWeb = kIsWeb;
-  int storyboardGraphLength = 0;
-  int storyboardGraphNumber = 0;
+  String _orderOfStoryboardGraph = '';
 
   void attach(StoryBoardState storyBoardState) {
     this.view = storyBoardState;
-    StoryboardGraph? graphForStoryboard = view.widget.graphForStoryboard;
-    if (graphForStoryboard != null) {
-      storyboardGraphLength = graphForStoryboard.children.length;
-    }
+  }
+
+  void numberStoryboardGraph(storyboardGraphLength, storyboardGraphNumber) {
+    _orderOfStoryboardGraph = "$storyboardGraphNumber : $storyboardGraphLength";
   }
 
   void toggle() {
@@ -257,9 +256,7 @@ class StoryBoardController {
       String relationDescription =
           view.widget.graphForCiAuto?.relationDescription ??
               "graphForCiAuto is null";
-      print(
-          "Storyboard: $storyboardGraphNumber : $storyboardGraphLength : $relationDescription");
-      storyboardGraphNumber++;
+      print("Storyboard: $_orderOfStoryboardGraph : $relationDescription");
       await _uploadAndDownloadUrlText(byteList);
       // final unawaited = _downloadImage(byteList);
       Navigator.of(view.context).pop();
