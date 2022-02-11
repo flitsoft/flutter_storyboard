@@ -50,8 +50,6 @@ class ChooseStoryBoardController {
           view.context,
           MaterialPageRoute(
             builder: (context) => StoryBoard(
-              storyboardGraphLength: storyBoardGraphFlow.length,
-              storyboardGraphNumber: storyBoardGraphFlow.indexOf(graph),
               translator: view.widget.translator,
               graphForCiAuto: graph,
               onMockEmAll: view.widget.onMockEmAll,

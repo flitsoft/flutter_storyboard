@@ -87,14 +87,10 @@ class StoryBoard extends StatefulWidget {
   final Function onMockEmAll;
   final String Function(dynamic stringCode) translator;
   final Widget Function(Key? key, Widget home) widgetParent;
-  final int storyboardGraphLength;
-  final int storyboardGraphNumber;
 
   const StoryBoard({
     Key? key,
     this.graphForCiAuto,
-    this.storyboardGraphLength = 0,
-    this.storyboardGraphNumber = 0,
     required this.translator,
     required this.onMockEmAll,
     this.graphForStoryboard,
@@ -178,8 +174,6 @@ class StoryBoardState extends State<StoryBoard> {
     // resetContainerForTest();
     super.initState();
     this.controller.attach(this);
-    this.controller.numberStoryboardGraph(
-        widget.storyboardGraphLength, widget.storyboardGraphNumber);
     SchedulerBinding.instance
         ?.addPostFrameCallback((_) => controller.onReady());
   }
