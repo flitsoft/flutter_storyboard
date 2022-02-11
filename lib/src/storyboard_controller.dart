@@ -230,7 +230,7 @@ class StoryBoardController {
     final UploadTask uploadTask = uploadData(byteList, fileName);
     final answer = await uploadTask;
     final url = await answer.ref.getDownloadURL();
-    print("$urlWithIsShowInPrKey:$url:${showFlowInPullRequest.toString()}");
+    print("$urlWithIsShowInPrKey=>$url=>${showFlowInPullRequest.toString()}");
     await GoogleMapsWebScreenshot.instance.downloadFile(
         """<img width="1680" alt="$fileName" src="$url">""", "url.txt");
     await Future.delayed(Duration(seconds: 5));
