@@ -247,7 +247,7 @@ class StoryBoardController {
       String relationDescription =
           view.widget.graphForCiAuto?.relationDescription ??
               "graphForCiAuto is null";
-      print("$storyboardKey: $relationDescription");
+      print("$storyboardKey $relationDescription");
       await _uploadAndDownloadUrlText(byteList);
       // final unawaited = _downloadImage(byteList);
       Navigator.of(view.context).pop();
