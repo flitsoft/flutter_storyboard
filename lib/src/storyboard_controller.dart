@@ -226,27 +226,28 @@ class StoryBoardController {
   Future<void> _uploadAndDownloadUrlText(Uint8List byteList) async {
     final fileName =
         "PR-Image-Screenshots${DateTime.now().millisecondsSinceEpoch}";
+    String urlWithIsShowInPrKey = 'urlWithIsShowInPrKey';
     final UploadTask uploadTask = uploadData(byteList, fileName);
     final answer = await uploadTask;
     final url = await answer.ref.getDownloadURL();
-    print("Download URL: $url");
-    if (showFlowInPullRequest) {
-      print("Download IMAGE PR: $url");
-    }
+    print("$urlWithIsShowInPrKey=>$url=>${showFlowInPullRequest.toString()}");
     await GoogleMapsWebScreenshot.instance.downloadFile(
         """<img width="1680" alt="$fileName" src="$url">""", "url.txt");
     await Future.delayed(Duration(seconds: 5));
   }
 
   Future<void> save() async {
+    String storyboardKey = "storyboardKey";
     final img = await graphAreaScreenshotCtrl.takeFlutterScreenShoot();
     if (img == null) return;
     final bytes = await img.toByteData(format: ImageByteFormat.png);
     if (bytes == null) return;
     final byteList = bytes.buffer.asUint8List();
     if (isCI()) {
-      print(
-          "Storyboard: ${view.widget.graphForCiAuto?.relationDescription ?? "graphForCiAuto is null"}");
+      String relationDescription =
+          view.widget.graphForCiAuto?.relationDescription ??
+              "graphForCiAuto is null";
+      print("$storyboardKey $relationDescription");
       await _uploadAndDownloadUrlText(byteList);
       // final unawaited = _downloadImage(byteList);
       Navigator.of(view.context).pop();
