@@ -120,14 +120,8 @@ class ClockService {
     Completer<T> completer = Completer();
     Timer? timerTimeout;
     if (timeout != null) {
-      timerTimeout = timer(timeout, (timer) {
-        if (!completer.isCompleted) {
-          completer.completeError(TimeoutException(
-            "Future ${logTag ?? ""} $trace not completed withing $timeout",
-            timeout,
-          ));
-        }
-      });
+      timerTimeout = timerFuture(
+          timeout: timeout, completer: completer, logTag: logTag, trace: trace);
     }
     final _ = future.then((value) {
       if (completer.isCompleted) return;
@@ -141,6 +135,19 @@ class ClockService {
       completer.completeError(error);
     });
     return completer.future;
+  }
+
+  void timeOutException({
+    required Completer completer,
+    required String trace,
+    required Duration timeout,
+    String? logTag,
+  }) {
+    if (completer.isCompleted) return;
+    completer.completeError(TimeoutException(
+      "Future ${logTag ?? ""} $trace not completed withing $timeout",
+      timeout,
+    ));
   }
 
   Future<void> futureDelayed(Duration delay) async {
@@ -165,6 +172,27 @@ class ClockService {
       streamCtrl.add(timer.isActive);
     }, true);
     return streamCtrl.stream;
+  }
+
+  Timer timerFuture({
+    required Duration timeout,
+    required Completer completer,
+    required String trace,
+    String? logTag,
+  }) {
+    if (!_mockMode)
+      return Timer(timeout, () {
+        timeOutException(
+          completer: completer,
+          timeout: timeout,
+          trace: trace,
+          logTag: logTag,
+        );
+      });
+    return timer(timeout, (timer) {
+      timeOutException(
+          completer: completer, timeout: timeout, trace: trace, logTag: logTag);
+    });
   }
 
   Timer timer(Duration duration, FutureOr<void> Function(Timer timer) callback,
