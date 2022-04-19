@@ -46,6 +46,7 @@ class ResolvedGraph {
 abstract class StoryScreenDelegate<T> {
   Future<void> onPumpAndSettle(Duration duration);
   Future<void> onTap({T? stringCode, Key? key, String? text});
+  Future<void> onLongPress({T? stringCode, Key? key, String? text});
   Future<void> onEnterText(String text);
   Future<void> sendTextInputAction(TextInputAction action);
   Future<void> drag({
@@ -118,6 +119,17 @@ class BaseStoryScreen<T> extends StoryScreen {
     if (item.length != 1) throw "Choose only either a key or text or textRaw";
     try {
       await delegate.onTap(stringCode: text, key: key, text: textRaw);
+    } catch (e, trace) {
+      Zone.current.parent?.handleUncaughtError(e, trace);
+    }
+    // print("$logTrace Attempt to tap while story is not yet built");
+  }
+
+  Future<void> longPress({T? text, Key? key, String? textRaw}) async {
+    final item = [text, key, textRaw].where((e) => e != null);
+    if (item.length != 1) throw "Choose only either a key or text or textRaw";
+    try {
+      await delegate.onLongPress(stringCode: text, key: key, text: textRaw);
     } catch (e, trace) {
       Zone.current.parent?.handleUncaughtError(e, trace);
     }

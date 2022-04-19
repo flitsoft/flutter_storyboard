@@ -69,6 +69,17 @@ class StoryBoardDelegate implements StoryScreenDelegate {
       await driver.tap(find.text(text));
     }
   }
+
+  @override
+  Future<void> onLongPress({stringCode, Key? key, String? text}) async {
+    if (stringCode != null) {
+      await driver.longPress(find.text(translator(stringCode)));
+    } else if (key != null) {
+      await driver.longPress(find.byValueKey((key as ValueKey).value));
+    } else if (text != null) {
+      await driver.longPress(find.text(text));
+    }
+  }
 }
 
 class StoryBoardController {
