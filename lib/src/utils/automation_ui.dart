@@ -22,6 +22,10 @@ class UiAutomationDriver extends FlutterDriver {
     return _prober.tap(finderFactory.createFinder(finder));
   }
 
+  Future<void> longPress(SerializableFinder finder, {Duration? timeout}) {
+    return _prober.longPress(finderFactory.createFinder(finder));
+  }
+
   @override
   Future<Map<String, dynamic>> sendCommand(Command command) async {
     final result =
