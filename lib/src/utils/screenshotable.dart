@@ -21,6 +21,11 @@ class ScreenshotController {
 
     print(
         "$logTrace Screenshot boundary obtained $boundary, now converting into image");
+    if (boundary.debugNeedsPaint) {
+      print("Waiting for boundary to be painted.");
+      await Future.delayed(const Duration(milliseconds: 20));
+      return takeFlutterScreenShoot(pxRatio);
+    }
     ui.Image image = await boundary.toImage(pixelRatio: pxRatio);
     print(
         "$logTrace taking flutter screenshot using RenderRepaintBoundary done");
