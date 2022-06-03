@@ -20,7 +20,7 @@ class ScreenshotController {
         this.view!.context.findRenderObject() as RenderRepaintBoundary;
 
     print(
-        "$logTrace Screenshot boundary obtained $boundary, now converting into image");
+        "$logTrace Screenshot boundary obtained $boundary, now converting into image needs paint? ${boundary.debugNeedsPaint}");
     if (boundary.debugNeedsPaint) {
       print("Waiting for boundary to be painted.");
       await Future.delayed(const Duration(milliseconds: 20));
