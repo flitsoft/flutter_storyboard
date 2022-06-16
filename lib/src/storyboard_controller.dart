@@ -2,89 +2,31 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:collection/collection.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_storyboard/src/choose_storyboard/choose_storyboard_page.dart';
-import 'package:flutter_storyboard/src/storyboard_model.dart';
-import 'package:flutter_storyboard/src/storyboard_view.dart';
+import 'package:flutter_storyboard/src/model/resolved_graph.dart';
+import 'package:flutter_storyboard/src/model/resolved_graph_container.dart';
+import 'package:flutter_storyboard/src/model/resolved_storyboard_data_store.dart';
+import 'package:flutter_storyboard/src/model/storyboard_graph.dart';
+import 'package:flutter_storyboard/src/model/storyboard_model.dart';
+import 'package:flutter_storyboard/src/model/view/graph_builder_view_model.dart';
+import 'package:flutter_storyboard/src/storyboard_delegate.dart';
 import 'package:flutter_storyboard/src/utils/automation_ui.dart';
+import 'package:flutter_storyboard/src/utils/internal_utils.dart';
 import 'package:flutter_storyboard/src/utils/screenshotable.dart';
 import 'package:flutter_storyboard/src/utils/services/clock_service.dart';
 import 'package:flutter_storyboard/src/utils/ui_image_widget.dart';
 import 'package:flutter_storyboard/src/utils/util.dart';
 import 'package:flutter_storyboard/src/utils/web/google_maps_snapshot.dart';
+import 'package:flutter_storyboard/src/view/storyboard_view.dart';
 import 'package:get_it/get_it.dart';
-
-class StoryBoardDelegate implements StoryScreenDelegate {
-  final UiAutomationDriver driver;
-  final String Function(dynamic stringCode) translator;
-  StoryBoardDelegate({required this.translator, required this.driver});
-
-  ClockService get clockService => GetIt.instance.get<ClockService>();
-
-  @override
-  Future<void> onEnterText(String text) async {
-    driver.testTextInput.enterText(text);
-  }
-
-  @override
-  Future<void> sendTextInputAction(TextInputAction action) async {
-    await driver.testTextInput.receiveAction(action);
-  }
-
-  @override
-  Future<void> onPump(Duration duration) async {
-    await clockService.elapse(duration);
-  }
-
-  @override
-  Future<void> onPumpAndSettle(Duration duration) {
-    return Future.delayed(duration);
-  }
-
-  @override
-  Future<void> drag({
-    required Key from,
-    required Key to,
-    required Duration during,
-  }) async {
-    final fromFinder = find.byValueKey((from as ValueKey).value);
-    final toCenter =
-        await driver.getCenter(find.byValueKey((to as ValueKey).value));
-    final fromCenter = await driver.getCenter(fromFinder);
-    final dx = toCenter.dx - fromCenter.dx;
-    final dy = toCenter.dy - fromCenter.dy;
-    print("$logTrace Dragging from $fromFinder with x: $dx, y: $dy");
-    await driver.scroll(fromFinder, dx, dy, during);
-  }
-
-  @override
-  Future<void> onTap({dynamic stringCode, Key? key, String? text}) async {
-    if (stringCode != null) {
-      await driver.tap(find.text(translator(stringCode)));
-    } else if (key != null) {
-      await driver.tap(find.byValueKey((key as ValueKey).value));
-    } else if (text != null) {
-      await driver.tap(find.text(text));
-    }
-  }
-
-  @override
-  Future<void> onLongPress({dynamic stringCode, Key? key, String? text}) async {
-    if (stringCode != null) {
-      await driver.longPress(find.text(translator(stringCode)));
-    } else if (key != null) {
-      await driver.longPress(find.byValueKey((key as ValueKey).value));
-    } else if (text != null) {
-      await driver.longPress(find.text(text));
-    }
-  }
-}
 
 class StoryBoardController {
   Widget spotLight = Container();
-  ResolvedGraph? resovedGraphRoot;
+  ResolvedGraphContainer? resovedGraphRoot;
   final spotLightScreenshotCtrl = ScreenshotController();
   final graphAreaScreenshotCtrl = ScreenshotController();
 
@@ -96,67 +38,128 @@ class StoryBoardController {
   bool showFlowInPullRequest = false;
   static bool isFlitWeb = kIsWeb;
   static bool isStoryboard = false;
+  late StoryboardGraph graphData;
+
+  ///
+  /// Method called by FE consumers
+  static void registerService() {
+    GetIt.instance.allowReassignment = true;
+    GetIt.instance.registerLazySingleton<ClockService>(() => ClockService());
+  }
 
   void attach(StoryBoardState storyBoardState) {
     this.view = storyBoardState;
   }
 
-  void toggle() {
-    spotLightVisible = !spotLightVisible;
-    this.view.applyState();
-  }
-
-  void reload() {
-    resovedGraphRoot = null;
-    onReady();
-  }
-
-  void chooseStoryBoard() {
-    StoryboardGraph? _graphForStoryboard = view.widget.graphForStoryboard;
-    if (_graphForStoryboard == null) return;
-    Navigator.push(
-      view.context,
-      MaterialPageRoute(
-          builder: (context) => ChooseStoryBoardPage(
-                translator: view.widget.translator,
-                onMockEmAll: view.widget.onMockEmAll,
-                graphForStoryboard: _graphForStoryboard,
-                widgetParent: view.widget.widgetParent,
-              )),
-    );
-  }
-
   Future<void> onReady() async {
+    final widgetGraphData =
+        view.widget.graphForCiAuto ?? view.widget.graphForStoryboard;
+    if (widgetGraphData == null) {
+      throw Exception("Graph data cannot be null");
+    }
+    graphData = widgetGraphData;
     print("$logTrace");
+
+    final url =
+        "https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b";
+    final resolvedGraphUrl = ResolvedGraphDataStore(
+      imageUrl: url,
+      graphName: 'SplashPageLoading',
+      relationDescription: 'root',
+      children: [
+        ResolvedGraphDataStore(
+          imageUrl: url,
+          graphName: 'LanguageSignUpPage',
+          relationDescription: 'root tap tap',
+          children: [
+            ResolvedGraphDataStore(
+              imageUrl: url,
+              graphName: 'ShowMoreLanguageClick',
+              relationDescription: 'root tap tap',
+              children: [],
+              size: Size(411.4, 740.0),
+            ),
+          ],
+          size: Size(411.4, 740.0),
+        ),
+        ResolvedGraphDataStore(
+          imageUrl: url,
+          graphName: 'OnBoardingLoading',
+          relationDescription: 'root tap tap',
+          children: [
+            ResolvedGraphDataStore(
+              imageUrl: url,
+              graphName: 'DragToConfirmYourDriver',
+              relationDescription: 'root tap tap',
+              children: [
+                ResolvedGraphDataStore(
+                  imageUrl: url,
+                  graphName: 'DragToTrackYourRide',
+                  relationDescription: 'root tap tap',
+                  children: [],
+                  size: Size(411.4, 740.0),
+                ),
+              ],
+              size: Size(411.4, 740.0),
+            ),
+          ],
+          size: Size(411.4, 740.0),
+        ),
+      ],
+      size: Size(411.4, 740.0),
+    );
+
+    _flattenStoryboardGraph(graphData);
+    _recursePrebuild(resolvedGraphUrl, []);
+    this.view.applyState();
 
     if (isCI()) {
       StoryboardGraph? _graphForCiAuto = view.widget.graphForCiAuto;
       if (_graphForCiAuto == null) return;
-      await recurse(_graphForCiAuto);
+      await _recurse(_graphForCiAuto);
     } else {
       StoryboardGraph? _graphForStoryboard = view.widget.graphForStoryboard;
       if (_graphForStoryboard == null) return;
-      await recurse(_graphForStoryboard);
+      await _recurse(_graphForStoryboard);
     }
     print("$logTrace All Graph Completed!");
     spotLightVisible = false;
     this.view.applyState();
-    await save();
+    await _save();
 
     // await _saveAllGraphScreenshot();
   }
 
-  Future<ResolvedGraph?> recurse(
+  Future<ResolvedGraphContainer?> _recurse(
     StoryboardGraph graph, {
-    ResolvedGraph? parent,
+    ResolvedGraphContainer? parent,
   }) async {
-    final resolvedGraph = await putOnSpotLight(graph);
+    // parent ??= resovedGraphRoot;
+    final siblings = parent == null ? [] : parent.children;
 
-    if (resolvedGraph == null) return null;
+    final _resolvedGraph = await _putOnSpotLight(graph);
+
+    if (_resolvedGraph == null) return null;
+    // if (parent == null) {
+    //   resovedGraphRoot = _resolvedGraph;
+    // }
+
+    final preBuiltResolvedGraph = siblings.firstWhereOrNull((element) {
+      final remote = element.remote;
+      if (remote == null) return false;
+      return remote.graph == _resolvedGraph.graph;
+    });
+    final resolvedGraph = preBuiltResolvedGraph ?? ResolvedGraphContainer();
+
+    resolvedGraph.locale = _resolvedGraph;
+
     if (!graph.enabled) return resolvedGraph;
 
     resovedGraphRoot ??= resolvedGraph;
-    parent?.children.add(resolvedGraph);
+    if (parent != null) {
+      parent.children.add(resolvedGraph);
+    }
+
     if (graph.showInPullRequest) {
       this.showFlowInPullRequest = true;
     }
@@ -166,13 +169,44 @@ class StoryBoardController {
     // aka resetting the map, removing layers...
     await Future.delayed(Duration(milliseconds: 500));
     for (final child in graph.children) {
-      final resolvedGraphChild = await recurse(child, parent: resolvedGraph);
+      final resolvedGraphChild = await _recurse(child, parent: resolvedGraph);
       if (resolvedGraphChild == null) continue;
     }
     return resolvedGraph;
   }
 
-  Future<ResolvedGraph?> resolveGraph(StoryboardGraph graph) async {
+  Map<int, ImageWidgetData> images = {};
+
+  void _recursePrebuild(
+    ResolvedGraphDataStore resolvedGraphUrl,
+    List<String> parentPath, {
+    ResolvedGraphContainer? parent,
+  }) {
+    final graph = _findGraph(parentPath);
+    final image = ImageWidgetData(
+      image: Image.network(resolvedGraphUrl.imageUrl),
+      size: resolvedGraphUrl.size,
+    );
+
+    final id = image.hashCode;
+    images[id] = image;
+
+    final resolved = ResolvedGraphFromRemote(
+        graphName: resolvedGraphUrl.graphName,
+        relationDescription: resolvedGraphUrl.relationDescription,
+        graph: graph == null ? null : graph.hashCode,
+        imageUrl: resolvedGraphUrl.imageUrl,
+        image: image.hashCode);
+    final resolvedGraph = ResolvedGraphContainer(remote: resolved);
+    resovedGraphRoot ??= resolvedGraph;
+    parent?.children.add(ResolvedGraphContainer(remote: resolved));
+    final newParentPath = [...parentPath, resolvedGraphUrl.graphName];
+    for (final child in resolvedGraphUrl.children) {
+      _recursePrebuild(child, newParentPath, parent: resolvedGraph);
+    }
+  }
+
+  Future<ResolvedGraphFromBuild?> _resolveGraph(StoryboardGraph graph) async {
     driver.testTextInput.unregister();
     print("$logTrace driver.testTextInput.unregister();");
 
@@ -184,10 +218,19 @@ class StoryBoardController {
     print("$logTrace Taking for Screenshot done $img");
 
     if (img == null) return null;
-    return ResolvedGraph(
-      graph: graph,
-      children: [],
-      image: img,
+    final image = ImageWidgetData(
+      image: UIImage(image: img),
+      size: Size(
+        img.width.toDouble(),
+        img.height.toDouble(),
+      ),
+    );
+    images[image.hashCode] = image;
+    return ResolvedGraphFromBuild(
+      graph: graph.hashCode,
+      image: image.hashCode,
+      relationDescription: graph.relationDescription,
+      graphName: graph.story.runtimeType.toString(),
     );
   }
 
@@ -216,7 +259,7 @@ class StoryBoardController {
     );
   }
 
-  UploadTask uploadData(Uint8List imageFile, String fileName) {
+  UploadTask _uploadData(Uint8List imageFile, String fileName) {
     Reference reference =
         FirebaseStorage.instance.ref().child("PR_Storyboards/$fileName");
     UploadTask uploadTask = reference.putData(
@@ -239,7 +282,7 @@ class StoryBoardController {
     final fileName =
         "PR-Image-Screenshots${DateTime.now().millisecondsSinceEpoch}";
     String urlWithIsShowInPrKey = 'urlWithIsShowInPrKey';
-    final UploadTask uploadTask = uploadData(byteList, fileName);
+    final UploadTask uploadTask = _uploadData(byteList, fileName);
     final answer = await uploadTask;
     final url = await answer.ref.getDownloadURL();
     print("$urlWithIsShowInPrKey=>$url=>${showFlowInPullRequest.toString()}");
@@ -248,7 +291,7 @@ class StoryBoardController {
     await Future.delayed(Duration(seconds: 5));
   }
 
-  Future<void> save() async {
+  Future<void> _save() async {
     String storyboardKey = "storyboardKey";
     final img = await graphAreaScreenshotCtrl.takeFlutterScreenShoot();
     if (img == null) return;
@@ -266,14 +309,7 @@ class StoryBoardController {
     }
   }
 
-  Future<void> onStoryScreenTap(ResolvedGraph resolvedGraph) async {
-    spotLightVisible = true;
-    view.applyState();
-    await Future.delayed(Duration(milliseconds: 500));
-    await putOnSpotLight(resolvedGraph.graph);
-  }
-
-  Future<ResolvedGraph?> putOnSpotLight(StoryboardGraph graph) async {
+  Future<ResolvedGraphFromBuild?> _putOnSpotLight(StoryboardGraph graph) async {
     currentGraph = graph;
     final story = graph.story;
     print("$logTrace ${story.runtimeType}");
@@ -300,7 +336,7 @@ class StoryBoardController {
         ),
       );
       this.view.applyState();
-      return resolveGraph(graph);
+      return _resolveGraph(graph);
     } else {
       spotLight = _rootWidget(key: _getNewKey(story), home: story.widget);
     }
@@ -324,7 +360,7 @@ class StoryBoardController {
     print("After stage");
 
     this.view.applyState();
-    final ResolvedGraph? resolvedGraph = await resolveGraph(graph);
+    final ResolvedGraphFromBuild? resolvedGraph = await _resolveGraph(graph);
     print("After resoved $resolvedGraph");
 
     if (resolvedGraph == null) return null;
@@ -357,13 +393,117 @@ class StoryBoardController {
     return ErrorWidget.builder(details);
   }
 
-  static void registerService() {
-    GetIt.instance.allowReassignment = true;
-    GetIt.instance.registerLazySingleton<ClockService>(() => ClockService());
-  }
-
   Key _getNewKey(BaseStoryScreen story) {
     return Key("${story.runtimeType.toString()}"
         "-${DateTime.now().microsecondsSinceEpoch}");
+  }
+
+  StoryboardGraph? _findGraph(List<String> parentPath) {
+    StoryboardGraph graph = graphData;
+    for (String parent in parentPath) {
+      final childFound = graph.children.firstWhereOrNull(
+          (element) => element.story.runtimeType.toString() == parent);
+      if (childFound == null) return null;
+      graph = childFound;
+    }
+    return graph;
+  }
+
+  Map<int, StoryboardGraph> graphMap = {};
+
+  void _flattenStoryboardGraph(StoryboardGraph graphData) {
+    graphMap[graphData.hashCode] = graphData;
+    for (final child in graphData.children) {
+      _flattenStoryboardGraph(child);
+    }
+  }
+
+  GraphBuilderViewModel? viewModel(ResolvedGraphContainer resolvedGraph) {
+    int? imageId;
+    final isOveriding =
+        ResolvedGraphContainerWithBoth.castFrom(resolvedGraph) != null;
+    final resolvedGraphLocal =
+        ResolvedGraphContainerWithLocal.castFrom(resolvedGraph);
+    if (resolvedGraphLocal != null) {
+      final locale = resolvedGraphLocal.locale;
+      imageId = locale.image;
+      final image = images[imageId];
+      if (image == null) return null;
+      return GraphBuilderViewModel(
+        image: image,
+        description: locale.relationDescription,
+        title: locale.graphName,
+        overriding: isOveriding,
+      );
+    }
+    final resolvedGraphWithRemote =
+        ResolvedGraphContainerWithRemote.castFrom(resolvedGraph);
+    if (resolvedGraphWithRemote != null) {
+      final remote = resolvedGraphWithRemote.remote;
+      imageId = remote.image;
+      final image = images[imageId];
+      if (image == null) return null;
+      return GraphBuilderViewModel(
+        image: image,
+        description: remote.relationDescription,
+        title: remote.graphName,
+        overriding: isOveriding,
+      );
+    }
+    return null;
+  }
+}
+
+extension StoryBoardControllerAction on StoryBoardController {
+  void toggle() {
+    spotLightVisible = !spotLightVisible;
+    this.view.applyState();
+  }
+
+  void reload() {
+    resovedGraphRoot = null;
+    onReady();
+  }
+
+  void chooseStoryBoard() {
+    StoryboardGraph? _graphForStoryboard = view.widget.graphForStoryboard;
+    if (_graphForStoryboard == null) return;
+    Navigator.push(
+      view.context,
+      MaterialPageRoute(
+          builder: (context) => ChooseStoryBoardPage(
+                translator: view.widget.translator,
+                onMockEmAll: view.widget.onMockEmAll,
+                graphForStoryboard: _graphForStoryboard,
+                widgetParent: view.widget.widgetParent,
+              )),
+    );
+  }
+
+  Future<void> onStoryScreenTap(ResolvedGraphContainer resolvedGraph) async {
+    int? graphId;
+    final resolvedGraphLocal =
+        ResolvedGraphContainerWithLocal.castFrom(resolvedGraph);
+    if (resolvedGraphLocal != null) {
+      graphId = resolvedGraphLocal.locale.graph;
+    }
+    final resolvedGraphWithRemote =
+        ResolvedGraphContainerWithRemote.castFrom(resolvedGraph);
+    if (resolvedGraphWithRemote != null) {
+      graphId = resolvedGraphWithRemote.remote.graph;
+    }
+    if (graphId == null) {
+      print("Graph code could not be found");
+      return;
+    }
+    final graph = graphMap[graphId];
+    if (graph == null) {
+      print("Graph code could not be found");
+      return;
+    }
+    spotLightVisible = true;
+    view.applyState();
+    await Future.delayed(Duration(milliseconds: 500));
+    await _putOnSpotLight(graph);
   }
 }

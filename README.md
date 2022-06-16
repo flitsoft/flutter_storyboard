@@ -28,3 +28,14 @@ Support multiple screensize with google maps (google maps cannot be transformed 
 7. Add UX complexity metrics (how long does it take to reach a screen)
 8. Add replay session from analytics
 9. Add version history exploring
+
+
+### Troubleshooting
+
+#### Preloaded image Not showing
+In Network tab, it will show as 200 OK but fail to load response
+In console, you won't see error in logs but you will see error icon in red on top.
+Click and it will open issues tab
+
+Setup cors
+https://stackoverflow.com/questions/65653801/flutter-web-cant-load-network-image-from-another-domain

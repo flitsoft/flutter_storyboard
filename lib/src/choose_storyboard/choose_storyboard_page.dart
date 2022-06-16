@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_storyboard/src/choose_storyboard/choose_storyboard_controller.dart';
-import 'package:flutter_storyboard/src/storyboard_model.dart';
+import 'package:flutter_storyboard/src/model/storyboard_graph.dart';
 import 'package:flutter_storyboard/src/utils/bottom_action_button.dart';
 
 class ChooseStoryBoardPage extends StatefulWidget {

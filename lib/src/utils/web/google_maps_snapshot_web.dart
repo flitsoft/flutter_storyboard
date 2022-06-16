@@ -3,7 +3,7 @@ import 'dart:js_util';
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_storyboard/src/utils/util.dart';
+import 'package:flutter_storyboard/src/utils/internal_utils.dart';
 import 'package:flutter_storyboard/src/utils/web/google_maps_snapshot.dart';
 import 'package:flutter_storyboard/src/utils/web/google_maps_snapshot_interop.dart';
 

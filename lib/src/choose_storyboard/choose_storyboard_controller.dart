@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_storyboard/src/choose_storyboard/choose_storyboard_page.dart';
-import 'package:flutter_storyboard/src/storyboard_model.dart';
-import 'package:flutter_storyboard/src/storyboard_view.dart';
+import 'package:flutter_storyboard/src/model/storyboard_graph.dart';
 import 'package:flutter_storyboard/src/utils/util.dart';
 import 'package:flutter_storyboard/src/utils/web/google_maps_snapshot.dart';
+import 'package:flutter_storyboard/src/view/storyboard_view.dart';
 
 class ChooseStoryBoardController {
   late ChooseStoryBoardPageState view;

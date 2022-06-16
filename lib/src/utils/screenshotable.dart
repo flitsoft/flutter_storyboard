@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_storyboard/src/utils/util.dart';
+import 'package:flutter_storyboard/src/utils/internal_utils.dart';
 
 class ScreenshotController {
   ScreenShotableState? view;

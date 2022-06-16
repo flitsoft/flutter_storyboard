@@ -1,23 +1,7 @@
 import 'dart:async';
-import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_storyboard/src/utils/util.dart';
-
-class StoryboardGraph {
-  bool enabled;
-  bool showInPullRequest;
-  final BaseStoryScreen story;
-  final String relationDescription;
-  final List<StoryboardGraph> children;
-
-  StoryboardGraph(
-      {this.enabled = true,
-      this.showInPullRequest = false,
-      required this.story,
-      required this.relationDescription,
-      required this.children});
-}
+import 'package:flutter_storyboard/src/utils/internal_utils.dart';
 
 class StoryBoardRelationship {
   final BaseStoryScreen parent;
@@ -31,15 +15,13 @@ class StoryBoardRelationship {
   });
 }
 
-class ResolvedGraph {
-  final StoryboardGraph graph;
-  final ui.Image image;
-  final List<ResolvedGraph> children;
+class ImageWidgetData {
+  final Size size;
+  final Widget image;
 
-  ResolvedGraph({
-    required this.graph,
+  ImageWidgetData({
+    required this.size,
     required this.image,
-    required this.children,
   });
 }
 

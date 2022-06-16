@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:device_preview/device_preview.dart';
@@ -6,80 +5,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_storyboard/src/constants/constants.dart';
+import 'package:flutter_storyboard/src/model/storyboard_graph.dart';
 import 'package:flutter_storyboard/src/storyboard_controller.dart';
-import 'package:flutter_storyboard/src/storyboard_model.dart';
 import 'package:flutter_storyboard/src/utils/device_preview/device_preview.dart';
 import 'package:flutter_storyboard/src/utils/gesture_visualizer.dart';
 import 'package:flutter_storyboard/src/utils/screenshotable.dart';
 import 'package:flutter_storyboard/src/utils/static_utils.dart';
-import 'package:flutter_storyboard/src/utils/ui_image_widget.dart';
-
-Size logicalSize = ui.window.physicalSize / ui.window.devicePixelRatio;
-final screenwidth = min(411.4, logicalSize.width * 0.8);
-final screenheight = min(740.0, logicalSize.height * 0.8);
-
-class GraphBuilder extends StatelessWidget {
-  final ResolvedGraph resolvedGraph;
-  final StoryBoardController controller;
-  const GraphBuilder({
-    Key? key,
-    required this.resolvedGraph,
-    required this.controller,
-  }) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: resolvedGraph.image.width.toDouble(),
-          child: Column(
-            children: [
-              Container(
-                height: resolvedGraph.image.height.toDouble(),
-                width: resolvedGraph.image.width.toDouble(),
-                child: InkWell(
-                  onTap: () => controller.onStoryScreenTap(resolvedGraph),
-                  child: UIImage(image: resolvedGraph.image),
-                ),
-              ),
-              Container(
-                width: resolvedGraph.image.width.toDouble(),
-                color: resolvedGraph.graph.showInPullRequest
-                    ? Colors.yellow
-                    : Colors.transparent,
-                child: Column(
-                  children: [
-                    Text(
-                      "${StaticUtils.camelToSentence(resolvedGraph.graph.story.runtimeType.toString())}",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(resolvedGraph.graph.relationDescription),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: resolvedGraph.children
-                .map((e) => GraphBuilder(
-                      controller: controller,
-                      resolvedGraph: e,
-                    ))
-                .toList(),
-          ),
-        ),
-      ],
-    );
-  }
-}
+import 'package:flutter_storyboard/src/view/graph_builder.dart';
 
 class StoryBoard extends StatefulWidget {
   final StoryboardGraph? graphForCiAuto;
@@ -91,9 +24,9 @@ class StoryBoard extends StatefulWidget {
   const StoryBoard({
     Key? key,
     this.graphForCiAuto,
+    this.graphForStoryboard,
     required this.translator,
     required this.onMockEmAll,
-    this.graphForStoryboard,
     required this.widgetParent,
   }) : super(key: key);
   @override
@@ -102,6 +35,19 @@ class StoryBoard extends StatefulWidget {
 
 class StoryBoardState extends State<StoryBoard> {
   final controller = StoryBoardController();
+
+  @override
+  void initState() {
+    // resetContainerForTest();
+    super.initState();
+    this.controller.attach(this);
+    SchedulerBinding.instance
+        ?.addPostFrameCallback((_) => controller.onReady());
+  }
+
+  void applyState() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -167,19 +113,6 @@ class StoryBoardState extends State<StoryBoard> {
         ),
       ),
     );
-  }
-
-  @override
-  void initState() {
-    // resetContainerForTest();
-    super.initState();
-    this.controller.attach(this);
-    SchedulerBinding.instance
-        ?.addPostFrameCallback((_) => controller.onReady());
-  }
-
-  void applyState() {
-    setState(() {});
   }
 
   //PROBLEM
