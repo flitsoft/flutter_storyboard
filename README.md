@@ -39,3 +39,14 @@ Click and it will open issues tab
 
 Setup cors
 https://stackoverflow.com/questions/65653801/flutter-web-cant-load-network-image-from-another-domain
+
+
+```
+flutter packages pub run build_runner build
+```
+
+- Resolves `json_serializable`
+
+```
+flutter pub run build_runner build --delete-conflicting-outputs
+```

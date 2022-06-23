@@ -15,6 +15,23 @@ class StoryBoardRelationship {
   });
 }
 
+extension on Size {
+  Map<String, dynamic> toJson() {
+    final instance = this;
+    final val = <String, dynamic>{};
+
+    void writeNotNull(String key, dynamic value) {
+      if (value != null) {
+        val[key] = value;
+      }
+    }
+
+    writeNotNull('width', instance.width);
+    writeNotNull('height', instance.height);
+    return val;
+  }
+}
+
 class ImageWidgetData {
   final Size size;
   final Widget image;
@@ -23,6 +40,20 @@ class ImageWidgetData {
     required this.size,
     required this.image,
   });
+
+  Map<String, dynamic> toJson() {
+    final instance = this;
+    final val = <String, dynamic>{};
+
+    void writeNotNull(String key, dynamic value) {
+      if (value != null) {
+        val[key] = value;
+      }
+    }
+
+    writeNotNull('size', instance.size.toJson());
+    return val;
+  }
 }
 
 abstract class StoryScreenDelegate<T> {

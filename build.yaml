@@ -16,3 +16,4 @@ targets:
           checked: true
           ignore_unannotated: true
           include_if_null: false
+          explicit_to_json: true

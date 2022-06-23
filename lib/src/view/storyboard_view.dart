@@ -42,7 +42,7 @@ class StoryBoardState extends State<StoryBoard> {
     super.initState();
     this.controller.attach(this);
     SchedulerBinding.instance
-        ?.addPostFrameCallback((_) => controller.onReady());
+        ?.addPostFrameCallback((_) => controller.startUp());
   }
 
   void applyState() {
@@ -99,11 +99,11 @@ class StoryBoardState extends State<StoryBoard> {
                 child: Container(
                   // height: screenheight,
                   color: Colors.red,
-                  child: controller.resovedGraphRoot == null
+                  child: controller.resolvedGraphRoot == null
                       ? Container()
                       : GraphBuilder(
                           controller: controller,
-                          resolvedGraph: controller.resovedGraphRoot!,
+                          resolvedGraph: controller.resolvedGraphRoot,
                         ),
                 ),
               ),

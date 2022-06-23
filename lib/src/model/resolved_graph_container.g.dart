@@ -9,9 +9,9 @@ part of 'resolved_graph_container.dart';
 ResolvedGraphContainer _$ResolvedGraphContainerFromJson(Map json) {
   return $checkedNew('ResolvedGraphContainer', json, () {
     final val = ResolvedGraphContainer(
-      locale: $checkedConvert(
+      local: $checkedConvert(
           json,
-          'locale',
+          'local',
           (v) => v == null
               ? null
               : ResolvedGraphFromBuild.fromJson(
@@ -45,9 +45,9 @@ Map<String, dynamic> _$ResolvedGraphContainerToJson(
     }
   }
 
-  writeNotNull('locale', instance.locale);
-  writeNotNull('remote', instance.remote);
-  val['children'] = instance.children;
+  writeNotNull('local', instance.local?.toJson());
+  writeNotNull('remote', instance.remote?.toJson());
+  val['children'] = instance.children.map((e) => e.toJson()).toList();
   return val;
 }
 
@@ -55,9 +55,9 @@ ResolvedGraphContainerWithLocal _$ResolvedGraphContainerWithLocalFromJson(
     Map json) {
   return $checkedNew('ResolvedGraphContainerWithLocal', json, () {
     final val = ResolvedGraphContainerWithLocal(
-      locale: $checkedConvert(
+      local: $checkedConvert(
           json,
-          'locale',
+          'local',
           (v) => ResolvedGraphFromBuild.fromJson(
               Map<String, dynamic>.from(v as Map))),
       remote: $checkedConvert(
@@ -82,7 +82,7 @@ ResolvedGraphContainerWithLocal _$ResolvedGraphContainerWithLocalFromJson(
 Map<String, dynamic> _$ResolvedGraphContainerWithLocalToJson(
     ResolvedGraphContainerWithLocal instance) {
   final val = <String, dynamic>{
-    'locale': instance.locale,
+    'local': instance.local.toJson(),
   };
 
   void writeNotNull(String key, dynamic value) {
@@ -91,8 +91,8 @@ Map<String, dynamic> _$ResolvedGraphContainerWithLocalToJson(
     }
   }
 
-  writeNotNull('remote', instance.remote);
-  val['children'] = instance.children;
+  writeNotNull('remote', instance.remote?.toJson());
+  val['children'] = instance.children.map((e) => e.toJson()).toList();
   return val;
 }
 
@@ -100,9 +100,9 @@ ResolvedGraphContainerWithRemote _$ResolvedGraphContainerWithRemoteFromJson(
     Map json) {
   return $checkedNew('ResolvedGraphContainerWithRemote', json, () {
     final val = ResolvedGraphContainerWithRemote(
-      locale: $checkedConvert(
+      local: $checkedConvert(
           json,
-          'locale',
+          'local',
           (v) => v == null
               ? null
               : ResolvedGraphFromBuild.fromJson(
@@ -134,9 +134,9 @@ Map<String, dynamic> _$ResolvedGraphContainerWithRemoteToJson(
     }
   }
 
-  writeNotNull('locale', instance.locale);
-  val['remote'] = instance.remote;
-  val['children'] = instance.children;
+  writeNotNull('local', instance.local?.toJson());
+  val['remote'] = instance.remote.toJson();
+  val['children'] = instance.children.map((e) => e.toJson()).toList();
   return val;
 }
 
@@ -144,9 +144,9 @@ ResolvedGraphContainerWithBoth _$ResolvedGraphContainerWithBothFromJson(
     Map json) {
   return $checkedNew('ResolvedGraphContainerWithBoth', json, () {
     final val = ResolvedGraphContainerWithBoth(
-      locale: $checkedConvert(
+      local: $checkedConvert(
           json,
-          'locale',
+          'local',
           (v) => v == null
               ? null
               : ResolvedGraphFromBuild.fromJson(
@@ -178,8 +178,8 @@ Map<String, dynamic> _$ResolvedGraphContainerWithBothToJson(
     }
   }
 
-  writeNotNull('locale', instance.locale);
-  val['remote'] = instance.remote;
-  val['children'] = instance.children;
+  writeNotNull('local', instance.local?.toJson());
+  val['remote'] = instance.remote.toJson();
+  val['children'] = instance.children.map((e) => e.toJson()).toList();
   return val;
 }

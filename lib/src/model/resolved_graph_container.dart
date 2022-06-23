@@ -10,16 +10,16 @@ abstract class SerializableProtocol {
 @JsonSerializable()
 class ResolvedGraphContainer implements SerializableProtocol {
   @JsonKey()
-  ResolvedGraphFromBuild? locale;
+  ResolvedGraphFromBuild? local;
   @JsonKey()
   ResolvedGraphFromRemote? remote;
   @JsonKey()
   List<ResolvedGraphContainer> children;
 
   ResolvedGraphContainer({
-    this.locale,
+    this.local,
     this.remote,
-    this.children = const [],
+    required this.children,
   });
 
   ResolvedGraphContainer fromJson(Map<String, dynamic> json) {
@@ -44,14 +44,14 @@ class ResolvedGraphContainer implements SerializableProtocol {
 @JsonSerializable()
 class ResolvedGraphContainerWithLocal implements SerializableProtocol {
   @JsonKey()
-  ResolvedGraphFromBuild locale;
+  ResolvedGraphFromBuild local;
   @JsonKey()
   ResolvedGraphFromRemote? remote;
   @JsonKey()
   List<ResolvedGraphContainer> children;
 
   ResolvedGraphContainerWithLocal({
-    required this.locale,
+    required this.local,
     this.remote,
     this.children = const [],
   });
@@ -76,14 +76,14 @@ class ResolvedGraphContainerWithLocal implements SerializableProtocol {
 @JsonSerializable()
 class ResolvedGraphContainerWithRemote {
   @JsonKey()
-  ResolvedGraphFromBuild? locale;
+  ResolvedGraphFromBuild? local;
   @JsonKey()
   ResolvedGraphFromRemote remote;
   @JsonKey()
   List<ResolvedGraphContainer> children;
 
   ResolvedGraphContainerWithRemote({
-    this.locale,
+    this.local,
     required this.remote,
     this.children = const [],
   });
@@ -98,7 +98,8 @@ class ResolvedGraphContainerWithRemote {
   static ResolvedGraphContainerWithRemote?
       castFrom<T extends SerializableProtocol>(T map) {
     try {
-      return ResolvedGraphContainerWithRemote.fromJson(map.toJson());
+      final mapJson = map.toJson();
+      return ResolvedGraphContainerWithRemote.fromJson(mapJson);
     } catch (e) {
       print(e);
       return null;
@@ -109,14 +110,14 @@ class ResolvedGraphContainerWithRemote {
 @JsonSerializable()
 class ResolvedGraphContainerWithBoth {
   @JsonKey()
-  ResolvedGraphFromBuild? locale;
+  ResolvedGraphFromBuild? local;
   @JsonKey()
   ResolvedGraphFromRemote remote;
   @JsonKey()
   List<ResolvedGraphContainer> children;
 
   ResolvedGraphContainerWithBoth({
-    this.locale,
+    this.local,
     required this.remote,
     this.children = const [],
   });
