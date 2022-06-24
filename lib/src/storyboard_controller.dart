@@ -1,14 +1,19 @@
 import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui';
+import 'dart:ui' as ui;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_storyboard/src/choose_storyboard/choose_storyboard_page.dart';
+import 'package:flutter_storyboard/src/constants/git_runner_key.dart';
 import 'package:flutter_storyboard/src/model/graph_shallow_reference.dart';
 import 'package:flutter_storyboard/src/model/resolved_graph.dart';
 import 'package:flutter_storyboard/src/model/resolved_graph_container.dart';
+import 'package:flutter_storyboard/src/model/resolved_storyboard_data_store.dart';
 import 'package:flutter_storyboard/src/model/storyboard_graph.dart';
 import 'package:flutter_storyboard/src/model/storyboard_model.dart';
 import 'package:flutter_storyboard/src/model/view/graph_builder_view_model.dart';
@@ -26,6 +31,7 @@ import 'package:get_it/get_it.dart';
 import 'storyboard_core.dart';
 
 class StoryBoardController {
+  GraphDataStore? graphStoreData;
   late StoryboardCore core = StoryboardCore(this);
   Widget spotLight = Container();
   ResolvedGraphContainer get resolvedGraphRoot => core.resolvedGraphRoot;
@@ -106,7 +112,6 @@ class StoryBoardController {
   Future<void> _uploadAndDownloadUrlText(Uint8List byteList) async {
     final fileName =
         "PR-Image-Screenshots${DateTime.now().millisecondsSinceEpoch}";
-    String urlWithIsShowInPrKey = 'urlWithIsShowInPrKey';
     final UploadTask uploadTask = _uploadData(byteList, fileName);
     final answer = await uploadTask;
     final url = await answer.ref.getDownloadURL();
@@ -116,22 +121,20 @@ class StoryBoardController {
     await Future.delayed(Duration(seconds: 5));
   }
 
-  Future<void> save() async {
-    String storyboardKey = "storyboardKey";
-    final img = await graphAreaScreenshotCtrl.takeFlutterScreenShoot();
-    if (img == null) return;
+  Future<Uint8List?> _convertImageToBytes(ui.Image img) async {
     final bytes = await img.toByteData(format: ImageByteFormat.png);
-    if (bytes == null) return;
-    final byteList = bytes.buffer.asUint8List();
-    if (isCI()) {
-      String relationDescription =
-          view.widget.graphForCiAuto?.relationDescription ??
-              "graphForCiAuto is null";
-      print("$storyboardKey $relationDescription");
-      await _uploadAndDownloadUrlText(byteList);
-      // final unawaited = _downloadImage(byteList);
-      Navigator.of(view.context).pop();
-    }
+    if (bytes == null) return null;
+    return bytes.buffer.asUint8List();
+  }
+
+  Future<void> save() async {
+    await _trySaveDataStore();
+    if (!isCI()) return;
+    final img = await graphAreaScreenshotCtrl.takeFlutterScreenShoot();
+    if (img == null) return null;
+    final byteList = await _convertImageToBytes(img);
+    if (byteList == null) return;
+    await _saveGiantScreenshot(byteList);
   }
 
   Future<ResolvedGraphFromBuild?> putOnSpotLight(StoryboardGraph graph) async {
@@ -283,18 +286,128 @@ class StoryBoardController {
     driver.testTextInput.register();
   }
 
+  Future<UploadTask?> getUploadTask(ImageWidgetData image) async {
+    if (view.widget.saveRun != true) return null;
+    final img = (image.image as UIImage).image;
+    final bytes = await _convertImageToBytes(img);
+    if (bytes == null) return null;
+    final uploadTask = _saveInvidivualScreenCaptureAsync(bytes);
+    print("$logTrace UploadTask should be this $uploadTask");
+    // https://stackoverflow.com/questions/64574430/flutter-returning-uploadtask-returns-tasksnapshot-instead
+    return Future.value(uploadTask);
+  }
+
+  UploadTask _saveInvidivualScreenCaptureAsync(Uint8List byteList) {
+    final fileName =
+        "Story-Image-Screenshots${DateTime.now().millisecondsSinceEpoch}";
+    final UploadTask uploadTask = _uploadData(byteList, fileName);
+    return uploadTask;
+  }
+
   Future<ImageWidgetData?> takeFlutterScreenShoot() async {
     final img = await spotLightScreenshotCtrl.takeFlutterScreenShoot();
     if (img == null) return null;
 
     final image = ImageWidgetData(
       image: UIImage(image: img),
-      size: Size(
+      size: StoryScreenSize(
         img.width.toDouble(),
         img.height.toDouble(),
       ),
     );
+    // image.image
     return image;
+  }
+
+  Future<void> _saveGiantScreenshot(Uint8List byteList) async {
+    if (!isCI()) return;
+
+    String relationDescription =
+        view.widget.graphForCiAuto?.relationDescription ??
+            "graphForCiAuto is null";
+    print("$storyboardKey $relationDescription");
+
+    await _uploadAndDownloadUrlText(byteList);
+    _tryPop();
+  }
+
+  void _tryPop() {
+    if (!isCI()) return;
+    // final unawaited = _downloadImage(byteList);
+    Navigator.of(view.context).pop();
+  }
+
+  Future<void> _trySaveDataStore() async {
+    print('$logTrace _trySaveDataStore');
+    if (!isCI() && view.widget.saveRun == false) return null;
+    await Future.wait(core.uploadTasks.values);
+    print('$logTrace all images screen uploaded');
+
+    final rootLocal = core.resolvedGraphRoot.children
+        .firstWhereOrNull((element) => element.local != null);
+    if (rootLocal == null) return;
+    final data = await _recurseGraphRootLocalToDataStore(rootLocal);
+    if (data == null) return;
+    await saveDatastore(data);
+  }
+
+  DocumentReference<Map<String, dynamic>> _docRoot() {
+    return FirebaseFirestore.instance
+        .collection('databases')
+        .doc('storyboard')
+        .collection('datastore')
+        .doc('tolotra');
+  }
+
+  Future<GraphDataStore?> read() async {
+    final documentData = await _docRoot().get();
+    final json = documentData.data();
+    if (json == null) return null;
+    return GraphDataStore.fromJson(json);
+  }
+
+  Future<void> saveDatastore(GraphDataStore data) async {
+    print('$logTrace Saving Ride ${data.toJson()}');
+    await _docRoot().set(data.toJson());
+  }
+
+  Future<GraphDataStore?> _recurseGraphRootLocalToDataStore(
+      ResolvedGraphContainer resolvedGraph) async {
+    final resolvedGraphWithLocal =
+        ResolvedGraphContainerWithLocal.castFrom(resolvedGraph);
+    if (resolvedGraphWithLocal == null) return null;
+    final resolvedGraphFromLocalWithUploadTask =
+        ResolvedGraphFromBuildWithUploadTask.castFrom(
+            resolvedGraphWithLocal.local);
+    if (resolvedGraphFromLocalWithUploadTask == null) return null;
+    final uploadTask =
+        core.uploadTasks[resolvedGraphFromLocalWithUploadTask.uploadTask];
+    if (uploadTask == null) return null;
+    final taskSnapshot = await uploadTask;
+    final url = await taskSnapshot.ref.getDownloadURL();
+    final image = this.lookupGraphLocale(resolvedGraph)?.image;
+    if (image == null) return null;
+    final data = GraphDataStore(
+      imageUrl: url,
+      size: image.size,
+      graphName: resolvedGraphWithLocal.local.graphName,
+      relationDescription: resolvedGraphWithLocal.local.relationDescription,
+      children: [],
+    );
+
+    for (final child in resolvedGraph.children) {
+      final dataStoreChild = await _recurseGraphRootLocalToDataStore(child);
+      if (dataStoreChild == null) continue;
+      data.children.add(dataStoreChild);
+    }
+
+    return data;
+  }
+
+  Future<void> readDataStore() async {
+    final datastore = await read();
+    print("$logTrace reading datastore ${datastore?.toJson()}");
+    this.graphStoreData = datastore;
   }
 }
 

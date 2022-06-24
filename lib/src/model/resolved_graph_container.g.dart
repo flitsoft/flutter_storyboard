@@ -147,10 +147,8 @@ ResolvedGraphContainerWithBoth _$ResolvedGraphContainerWithBothFromJson(
       local: $checkedConvert(
           json,
           'local',
-          (v) => v == null
-              ? null
-              : ResolvedGraphFromBuild.fromJson(
-                  Map<String, dynamic>.from(v as Map))),
+          (v) => ResolvedGraphFromBuild.fromJson(
+              Map<String, dynamic>.from(v as Map))),
       remote: $checkedConvert(
           json,
           'remote',
@@ -169,17 +167,9 @@ ResolvedGraphContainerWithBoth _$ResolvedGraphContainerWithBothFromJson(
 }
 
 Map<String, dynamic> _$ResolvedGraphContainerWithBothToJson(
-    ResolvedGraphContainerWithBoth instance) {
-  final val = <String, dynamic>{};
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('local', instance.local?.toJson());
-  val['remote'] = instance.remote.toJson();
-  val['children'] = instance.children.map((e) => e.toJson()).toList();
-  return val;
-}
+        ResolvedGraphContainerWithBoth instance) =>
+    <String, dynamic>{
+      'local': instance.local.toJson(),
+      'remote': instance.remote.toJson(),
+      'children': instance.children.map((e) => e.toJson()).toList(),
+    };

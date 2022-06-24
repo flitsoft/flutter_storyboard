@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:collection/collection.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_storyboard/src/model/resolved_graph.dart';
 import 'package:flutter_storyboard/src/model/resolved_graph_container.dart';
@@ -18,72 +18,15 @@ class StoryboardCore {
       ResolvedGraphContainer(children: []);
 
   Map<int, ImageWidgetData> images = {};
+  Map<int, UploadTask> uploadTasks = {};
   StoryboardCore(this.parent);
   Future<void> onReady() async {
     print("$logTrace");
 
-    final url =
-        "https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b";
-    final resolvedGraphUrl = ResolvedGraphDataStore(
-      imageUrl: url,
-      graphName: 'ContainerLoading',
-      relationDescription: 'Root tap tap',
-      children: [
-        ResolvedGraphDataStore(
-          imageUrl: url,
-          graphName: 'SplashPageLoading',
-          relationDescription: 'root',
-          children: [
-            ResolvedGraphDataStore(
-              imageUrl: url,
-              graphName: 'LanguageSignUpPage',
-              relationDescription: 'root tap tap',
-              children: [
-                ResolvedGraphDataStore(
-                  imageUrl: url,
-                  graphName: 'ShowMoreLanguageClick',
-                  relationDescription: 'root tap tap',
-                  children: [],
-                  size: Size(411.4, 740.0),
-                ),
-              ],
-              size: Size(411.4, 740.0),
-            ),
-            ResolvedGraphDataStore(
-              imageUrl: url,
-              graphName: 'OnBoardingLoading',
-              relationDescription: 'root tap tap',
-              children: [
-                ResolvedGraphDataStore(
-                  imageUrl: url,
-                  graphName: 'DragToConfirmYourDriver',
-                  relationDescription: 'root tap tap',
-                  children: [
-                    ResolvedGraphDataStore(
-                      imageUrl: url,
-                      graphName: 'DragToTrackYourRide',
-                      relationDescription: 'root tap tap',
-                      children: [],
-                      size: Size(411.4, 740.0),
-                    ),
-                  ],
-                  size: Size(411.4, 740.0),
-                ),
-              ],
-              size: Size(411.4, 740.0),
-            ),
-          ],
-          size: Size(411.4, 740.0),
-        ),
-      ],
-      size: Size(411.4, 740.0),
-    );
-
+    await parent.readDataStore();
     _flattenStoryboardGraph(parent.graphData);
 
-    _recursePrebuild(resolvedGraphUrl, [resolvedGraphUrl.graphName],
-        parent: resolvedGraphRoot);
-
+    _resolvePrebuild();
     this.parent.applyState();
 
     await _recurse(parent.graphData, parent: resolvedGraphRoot);
@@ -120,7 +63,7 @@ class StoryboardCore {
   }
 
   void _recursePrebuild(
-    ResolvedGraphDataStore resolvedGraphUrl,
+    GraphDataStore resolvedGraphUrl,
     List<String> parentPath, {
     required ResolvedGraphContainer parent,
   }) {
@@ -128,9 +71,10 @@ class StoryboardCore {
       print("breakpoint");
     }
     final graph = _findGraph(parentPath);
+    final size = resolvedGraphUrl.size;
     final image = ImageWidgetData(
       image: Image.network(resolvedGraphUrl.imageUrl),
-      size: resolvedGraphUrl.size,
+      size: StoryScreenSize(size.width, size.height),
     );
 
     final id = image.hashCode;
@@ -231,8 +175,14 @@ class StoryboardCore {
     print("$logTrace Taking for Screenshot done $img");
 
     if (img == null) return null;
+    final uploadTask = await parent.getUploadTask(img);
+    print("$logTrace UploadTask before save is $uploadTask");
+
+    _saveUploadTaskIfNotNull(uploadTask);
     images[img.hashCode] = img;
+
     return ResolvedGraphFromBuild(
+      uploadTask: uploadTask.hashCode,
       graph: graph.hashCode,
       image: img.hashCode,
       relationDescription: graph.relationDescription,
@@ -298,5 +248,17 @@ class StoryboardCore {
     });
 
     return json;
+  }
+
+  void _resolvePrebuild() {
+    final resolvedGraphUrl = parent.graphStoreData;
+    if (resolvedGraphUrl == null) return;
+    _recursePrebuild(resolvedGraphUrl, [resolvedGraphUrl.graphName],
+        parent: resolvedGraphRoot);
+  }
+
+  void _saveUploadTaskIfNotNull(UploadTask? uploadTask) {
+    if (uploadTask == null) return;
+    uploadTasks[uploadTask.hashCode] = uploadTask;
   }
 }

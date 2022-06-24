@@ -24,7 +24,6 @@ class ChooseStoryBoardPage extends StatefulWidget {
 class ChooseStoryBoardPageState extends State<ChooseStoryBoardPage> {
   ChooseStoryBoardController controller = ChooseStoryBoardController();
   static const Key runKey = Key("runKey");
-  List<StoryboardGraph>? listStoryboardGraph;
 
   ChooseStoryBoardPageState() {
     controller.attach(this);
@@ -32,7 +31,6 @@ class ChooseStoryBoardPageState extends State<ChooseStoryBoardPage> {
 
   @override
   void initState() {
-    listStoryboardGraph = widget.graphForStoryboard.children;
     super.initState();
     SchedulerBinding.instance
         ?.addPostFrameCallback((_) => controller.initState());
@@ -44,43 +42,53 @@ class ChooseStoryBoardPageState extends State<ChooseStoryBoardPage> {
 
   @override
   Widget build(BuildContext context) {
-    List<StoryboardGraph>? _listStoryboardGraph = listStoryboardGraph;
-    if (_listStoryboardGraph == null) {
-      return Container(
-        child: Text("StoryboardGraph is empty"),
-      );
-    }
+    List<StoryboardGraph> _listStoryboardGraph =
+        widget.graphForStoryboard.children;
     return Scaffold(
       appBar: AppBar(
         title: Text("Choose storyBoard"),
       ),
-      body: ListView.builder(
-        scrollDirection: Axis.vertical,
-        itemCount: _listStoryboardGraph.length + 1,
-        itemBuilder: (BuildContext context, int index) {
-          if (index == _listStoryboardGraph.length) {
-            return BottomActionButton(
-              key: runKey,
-              padding: MediaQuery.of(context).size.width * .025,
-              text: "Run storyboard",
-              backgroundColor: Colors.deepOrangeAccent,
-              // width: 280.0,
-              onPressed: () {
-                controller.gotoStoryboard();
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Expanded(
+            child: ListView.builder(
+              shrinkWrap: false,
+              scrollDirection: Axis.vertical,
+              itemCount: _listStoryboardGraph.length,
+              itemBuilder: (BuildContext context, int index) {
+                return CheckboxListTile(
+                  value: _listStoryboardGraph.elementAt(index).enabled,
+                  onChanged: (bool? value) {
+                    controller.onChanged(value, index);
+                  },
+                  title: Text(_listStoryboardGraph
+                      .elementAt(index)
+                      .relationDescription),
+                );
               },
-            );
-          }
-          return CheckboxListTile(
-            value: _listStoryboardGraph.elementAt(index).enabled,
-            onChanged: (bool? value) {
-              setState(() {
-                _listStoryboardGraph.elementAt(index).enabled = value!;
-              });
+            ),
+          ),
+          BottomActionButton(
+            key: runKey,
+            padding: MediaQuery.of(context).size.width * .025,
+            text: "Run storyboard",
+            backgroundColor: Colors.deepOrangeAccent,
+            // width: 280.0,
+            onPressed: () {
+              controller.onStoryboardRunTapped();
             },
-            title:
-                Text(_listStoryboardGraph.elementAt(index).relationDescription),
-          );
-        },
+          ),
+          CheckboxListTile(
+            value: controller.saveRun,
+            onChanged: (bool? value) {
+              controller.onSaveRunToggle(value);
+            },
+            title: Text(
+              "Save run",
+            ),
+          ),
+        ],
       ),
     );
   }

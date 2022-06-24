@@ -20,7 +20,7 @@ class StoryBoard extends StatefulWidget {
   final Function onMockEmAll;
   final String Function(dynamic stringCode) translator;
   final Widget Function(Key? key, Widget home) widgetParent;
-
+  final bool saveRun;
   const StoryBoard({
     Key? key,
     this.graphForCiAuto,
@@ -28,6 +28,7 @@ class StoryBoard extends StatefulWidget {
     required this.translator,
     required this.onMockEmAll,
     required this.widgetParent,
+    required this.saveRun,
   }) : super(key: key);
   @override
   StoryBoardState createState() => StoryBoardState();

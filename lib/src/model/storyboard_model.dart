@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_storyboard/src/model/resolved_storyboard_data_store.dart';
 import 'package:flutter_storyboard/src/utils/internal_utils.dart';
 
 class StoryBoardRelationship {
@@ -33,10 +35,12 @@ extension on Size {
 }
 
 class ImageWidgetData {
-  final Size size;
+  final StoryScreenSize size;
   final Widget image;
+  final UploadTask? uploadTask;
 
   ImageWidgetData({
+    this.uploadTask,
     required this.size,
     required this.image,
   });

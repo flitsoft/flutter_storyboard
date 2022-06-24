@@ -8,57 +8,68 @@ import 'package:flutter_storyboard/src/view/storyboard_view.dart';
 class ChooseStoryBoardController {
   late ChooseStoryBoardPageState view;
   bool canInstanciate = true;
+
+  bool saveRun = false;
   void attach(ChooseStoryBoardPageState _state) {
     view = _state;
   }
 
-  void gotoStoryboard() {
-    if (canInstanciate) {
-      print("First instance!");
-      canInstanciate = !canInstanciate;
-      Navigator.push(
-        view.context,
-        MaterialPageRoute(
-          builder: (BuildContext context) => StoryBoard(
-            translator: view.widget.translator,
-            onMockEmAll: view.widget.onMockEmAll,
-            graphForStoryboard: view.widget.graphForStoryboard,
-            widgetParent: view.widget.widgetParent,
-          ),
+  void onStoryboardRunTapped() {
+    Navigator.push(
+      view.context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => StoryBoard(
+          saveRun: saveRun,
+          translator: view.widget.translator,
+          onMockEmAll: view.widget.onMockEmAll,
+          graphForStoryboard: view.widget.graphForStoryboard,
+          widgetParent: view.widget.widgetParent,
         ),
-      );
-    } else {
-      print("!!!!!!!!!!!New instance detected!!!!!!!!!!!");
-    }
+      ),
+    );
   }
 
   Future<void> initState() async {
     final storyboardFlow = getCiStoryboardFlow();
-    if (isCI()) {
-      List<StoryboardGraph> storyBoardGraphFlow = view
-          .widget.graphForStoryboard.children
-          .where((element) =>
-              (element.story.runtimeType.toString() == storyboardFlow) ||
-              storyboardFlow == "all")
-          .toList();
+    if (!isCI()) return;
+    List<StoryboardGraph> storyBoardGraphFlow = view
+        .widget.graphForStoryboard.children
+        .where((element) =>
+            (element.story.runtimeType.toString() == storyboardFlow) ||
+            storyboardFlow == "all")
+        .toList();
 
-      print("[CI] running ${storyBoardGraphFlow.length} storyboard flows "
-          "with ${storyBoardGraphFlow.map((e) => e.story.runtimeType)}");
+    print("[CI] running ${storyBoardGraphFlow.length} storyboard flows "
+        "with ${storyBoardGraphFlow.map((e) => e.story.runtimeType)}");
 
-      for (final StoryboardGraph graph in storyBoardGraphFlow) {
-        await Navigator.push(
-          view.context,
-          MaterialPageRoute(
-            builder: (context) => StoryBoard(
-              translator: view.widget.translator,
-              graphForCiAuto: graph,
-              onMockEmAll: view.widget.onMockEmAll,
-              widgetParent: view.widget.widgetParent,
-            ),
+    for (final StoryboardGraph graph in storyBoardGraphFlow) {
+      await Navigator.push(
+        view.context,
+        MaterialPageRoute(
+          builder: (context) => StoryBoard(
+            saveRun: true,
+            translator: view.widget.translator,
+            graphForCiAuto: graph,
+            onMockEmAll: view.widget.onMockEmAll,
+            widgetParent: view.widget.widgetParent,
           ),
-        );
-      }
-      GoogleMapsWebScreenshot.instance.exit();
+        ),
+      );
     }
+    GoogleMapsWebScreenshot.instance.exit();
+  }
+
+  void onChanged(bool? value, int index) {
+    if (value == null) return;
+    List<StoryboardGraph> listStoryboardGraph =
+        view.widget.graphForStoryboard.children;
+    listStoryboardGraph.elementAt(index).enabled = value;
+    view.applyState();
+  }
+
+  void onSaveRunToggle(bool? value) {
+    if (value == null) return;
+    this.saveRun = value;
+    view.applyState();
   }
 }

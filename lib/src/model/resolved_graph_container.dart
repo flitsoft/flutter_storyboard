@@ -110,14 +110,14 @@ class ResolvedGraphContainerWithRemote {
 @JsonSerializable()
 class ResolvedGraphContainerWithBoth {
   @JsonKey()
-  ResolvedGraphFromBuild? local;
+  ResolvedGraphFromBuild local;
   @JsonKey()
   ResolvedGraphFromRemote remote;
   @JsonKey()
   List<ResolvedGraphContainer> children;
 
   ResolvedGraphContainerWithBoth({
-    this.local,
+    required this.local,
     required this.remote,
     this.children = const [],
   });

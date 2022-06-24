@@ -1,22 +1,45 @@
+import 'package:json_annotation/json_annotation.dart';
 
+part 'resolved_storyboard_data_store.g.dart';
 
-import 'package:flutter/painting.dart';
-import 'package:flutter_storyboard/src/model/storyboard_graph.dart';
+@JsonSerializable()
+class StoryScreenSize {
+  @JsonKey()
+  final double width;
+  @JsonKey()
+  final double height;
 
-class ResolvedGraphDataStore {
-  final StoryboardGraph? graph;
-  final List<ResolvedGraphDataStore> children;
+  StoryScreenSize(this.width, this.height);
+
+  factory StoryScreenSize.fromJson(Map<String, dynamic> json) =>
+      _$StoryScreenSizeFromJson(json);
+
+  Map<String, dynamic> toJson() => _$StoryScreenSizeToJson(this);
+}
+
+@JsonSerializable()
+class GraphDataStore {
+  @JsonKey()
+  final List<GraphDataStore> children;
+  @JsonKey()
   final String imageUrl;
-  final Size size;
+  @JsonKey()
+  final StoryScreenSize size;
+  @JsonKey()
   final String graphName;
+  @JsonKey()
   final String relationDescription;
 
-  ResolvedGraphDataStore({
+  GraphDataStore({
     required this.imageUrl,
     required this.size,
     required this.graphName,
     required this.relationDescription,
-    this.graph,
     required this.children,
   });
+
+  factory GraphDataStore.fromJson(Map<String, dynamic> json) =>
+      _$ResolvedGraphDataStoreFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ResolvedGraphDataStoreToJson(this);
 }
