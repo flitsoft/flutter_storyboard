@@ -1,5 +1,5 @@
 @JS()
-library coolLib;
+library google_maps_snapshot;
 
 import 'dart:async';
 

@@ -17,20 +17,18 @@ class StoryBoardRelationship {
   });
 }
 
-extension on Size {
-  Map<String, dynamic> toJson() {
-    final instance = this;
-    final val = <String, dynamic>{};
+class UploadTaskWitUrl {
+  final UploadTask uploadTask;
+  String? url;
+  final completer = Completer<String>();
 
-    void writeNotNull(String key, dynamic value) {
-      if (value != null) {
-        val[key] = value;
-      }
-    }
+  UploadTaskWitUrl(this.uploadTask);
 
-    writeNotNull('width', instance.width);
-    writeNotNull('height', instance.height);
-    return val;
+  Future<void> start() async {
+    final taskSnapshot = await uploadTask;
+    final url = await taskSnapshot.ref.getDownloadURL();
+    this.url = url;
+    completer.complete(url);
   }
 }
 

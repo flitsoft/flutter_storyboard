@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:collection/collection.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_storyboard/src/model/resolved_graph.dart';
 import 'package:flutter_storyboard/src/model/resolved_graph_container.dart';
@@ -18,7 +17,7 @@ class StoryboardCore {
       ResolvedGraphContainer(children: []);
 
   Map<int, ImageWidgetData> images = {};
-  Map<int, UploadTask> uploadTasks = {};
+  Map<int, UploadTaskWitUrl> uploadTasks = {};
   StoryboardCore(this.parent);
   Future<void> onReady() async {
     print("$logTrace");
@@ -81,6 +80,7 @@ class StoryboardCore {
     images[id] = image;
 
     final resolved = ResolvedGraphFromRemote(
+        hash: resolvedGraphUrl.hash,
         graphName: resolvedGraphUrl.graphName,
         relationDescription: resolvedGraphUrl.relationDescription,
         graph: graph == null ? null : graph.hashCode,
@@ -139,6 +139,10 @@ class StoryboardCore {
     if (preBuiltResolvedGraph == null) {
       siblings.add(resolvedGraph);
     }
+
+    if (preBuiltResolvedGraph != null) {
+      this.parent.compareImageChange(preBuiltResolvedGraph);
+    }
     // resolvedGraph.children.clear();
     // resolvedGraph.children.addAll(siblings);
 
@@ -178,10 +182,13 @@ class StoryboardCore {
     final uploadTask = await parent.getUploadTask(img);
     print("$logTrace UploadTask before save is $uploadTask");
 
+    final hash = await this.parent.computeImageHash(img);
+    if (hash == null) return null;
     _saveUploadTaskIfNotNull(uploadTask);
     images[img.hashCode] = img;
 
     return ResolvedGraphFromBuild(
+      hash: hash,
       uploadTask: uploadTask.hashCode,
       graph: graph.hashCode,
       image: img.hashCode,
@@ -192,21 +199,6 @@ class StoryboardCore {
 
   void reload() {
     resolvedGraphRoot = ResolvedGraphContainer(children: []);
-  }
-
-  List<ResolvedGraphContainer> _getSiblings(ResolvedGraphContainer? parent) {
-    final resolvedGraphRootLocal = resolvedGraphRoot;
-
-    final List<ResolvedGraphContainer> siblings = [];
-    if (parent == null && resolvedGraphRootLocal != null) {
-      siblings.add(resolvedGraphRootLocal);
-      return siblings;
-    }
-    if (parent == null) {
-      return siblings;
-    }
-    siblings.addAll(parent.children);
-    return siblings;
   }
 
   Map<String, dynamic> resolvedGraphRootToJsonForTest() {
@@ -257,7 +249,7 @@ class StoryboardCore {
         parent: resolvedGraphRoot);
   }
 
-  void _saveUploadTaskIfNotNull(UploadTask? uploadTask) {
+  void _saveUploadTaskIfNotNull(UploadTaskWitUrl? uploadTask) {
     if (uploadTask == null) return;
     uploadTasks[uploadTask.hashCode] = uploadTask;
   }

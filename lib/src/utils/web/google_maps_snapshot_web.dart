@@ -10,7 +10,7 @@ import 'package:flutter_storyboard/src/utils/web/google_maps_snapshot_interop.da
 class GoogleMapsWebScreenshotImpl implements GoogleMapsWebScreenshot {
   @override
   Future<Uint8List?> takeSnapshot(int mapId) async {
-    final id = "plugins.flutter.io/google_maps_${mapId}";
+    final id = "plugins.flutter.io/google_maps_$mapId";
     print("$logTrace calling web function with $id");
     final result = await promiseToFuture(takeGoogleMapSnapshot(id));
     if (result == null) return null;

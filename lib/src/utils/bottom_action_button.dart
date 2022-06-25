@@ -35,28 +35,33 @@ class BottomActionButton extends StatelessWidget {
             Expanded(
               child: ButtonTheme(
                 minWidth: width,
-                child: RaisedButton(
-                    child: Container(
-                      height: 50.0,
-                      child: Center(
-                        child: builder == null
-                            ? AutoSizeText(
-                                text,
-                                maxLines: 1,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: color,
-                                  fontSize: 20.0,
-                                ),
-                              )
-                            : builder!(),
-                      ),
+                child: ElevatedButton(
+                  child: Container(
+                    height: 50.0,
+                    child: Center(
+                      child: builder == null
+                          ? AutoSizeText(
+                              text,
+                              maxLines: 1,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: color,
+                                fontSize: 20.0,
+                              ),
+                            )
+                          : builder!(),
                     ),
-                    elevation: 5.0,
-                    color: backgroundColor,
-                    onPressed: onPressed,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0))),
+                  ),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(backgroundColor),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                    )),
+                    elevation: MaterialStateProperty.all(5.0),
+                  ),
+                  onPressed: onPressed,
+                ),
               ),
             ),
           ],

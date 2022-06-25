@@ -92,7 +92,6 @@ class MyDevicePreview extends StatefulWidget {
     DevicePreviewStorage? storage,
     this.enabled = true,
   })  : assert(devices == null || devices.isNotEmpty),
-        assert(isToolbarVisible != null),
         storage = storage ?? DevicePreviewStorage.preferences(),
         super(key: key);
 
@@ -327,7 +326,7 @@ class _DevicePreviewState extends State<MyDevicePreview> {
   }
 
   Widget _buildPreview(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
+    final _ = MediaQuery.of(context);
     final device = context.select(
       (DevicePreviewStore store) => store.deviceInfo,
     );

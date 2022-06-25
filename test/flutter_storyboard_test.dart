@@ -1,4 +1,3 @@
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_storyboard/flutter_storyboard.dart';
@@ -32,7 +31,7 @@ class MockStoryboardController extends StoryBoardController {
     return ImageWidgetData(size: StoryScreenSize(13, 14), image: Container());
   }
 
-  Future<UploadTask?> getUploadTask(ImageWidgetData image) async {
+  Future<UploadTaskWitUrl?> getUploadTask(ImageWidgetData image) async {
     return null;
   }
 }

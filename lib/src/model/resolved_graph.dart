@@ -56,13 +56,13 @@ class ResolvedGraphFromBuild implements SerializableProtocol {
   @JsonKey()
   final int image;
   @JsonKey()
-  final int? uploadTask;
+  final int uploadTask;
   @JsonKey()
-  final String? imageUrl;
+  final String hash;
 
   ResolvedGraphFromBuild({
-    this.imageUrl,
-    this.uploadTask,
+    required this.hash,
+    required this.uploadTask,
     required this.graphName,
     required this.relationDescription,
     required this.graph,
@@ -86,10 +86,13 @@ class ResolvedGraphFromRemote {
   @JsonKey()
   final int image;
   @JsonKey()
-  final String? imageUrl;
+  final String imageUrl;
+  @JsonKey()
+  final String hash;
 
   ResolvedGraphFromRemote({
-    this.imageUrl,
+    required this.hash,
+    required this.imageUrl,
     required this.graphName,
     required this.relationDescription,
     required this.graph,

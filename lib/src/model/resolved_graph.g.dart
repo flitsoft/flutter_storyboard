@@ -45,8 +45,8 @@ Map<String, dynamic> _$ResolvedGraphFromBuildWithUploadTaskToJson(
 ResolvedGraphFromBuild _$ResolvedGraphFromBuildFromJson(Map json) {
   return $checkedNew('ResolvedGraphFromBuild', json, () {
     final val = ResolvedGraphFromBuild(
-      imageUrl: $checkedConvert(json, 'imageUrl', (v) => v as String?),
-      uploadTask: $checkedConvert(json, 'uploadTask', (v) => v as int?),
+      hash: $checkedConvert(json, 'hash', (v) => v as String),
+      uploadTask: $checkedConvert(json, 'uploadTask', (v) => v as int),
       graphName: $checkedConvert(json, 'graphName', (v) => v as String),
       relationDescription:
           $checkedConvert(json, 'relationDescription', (v) => v as String),
@@ -58,29 +58,21 @@ ResolvedGraphFromBuild _$ResolvedGraphFromBuildFromJson(Map json) {
 }
 
 Map<String, dynamic> _$ResolvedGraphFromBuildToJson(
-    ResolvedGraphFromBuild instance) {
-  final val = <String, dynamic>{
-    'graphName': instance.graphName,
-    'relationDescription': instance.relationDescription,
-    'graph': instance.graph,
-    'image': instance.image,
-  };
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('uploadTask', instance.uploadTask);
-  writeNotNull('imageUrl', instance.imageUrl);
-  return val;
-}
+        ResolvedGraphFromBuild instance) =>
+    <String, dynamic>{
+      'graphName': instance.graphName,
+      'relationDescription': instance.relationDescription,
+      'graph': instance.graph,
+      'image': instance.image,
+      'uploadTask': instance.uploadTask,
+      'hash': instance.hash,
+    };
 
 ResolvedGraphFromRemote _$ResolvedGraphFromRemoteFromJson(Map json) {
   return $checkedNew('ResolvedGraphFromRemote', json, () {
     final val = ResolvedGraphFromRemote(
-      imageUrl: $checkedConvert(json, 'imageUrl', (v) => v as String?),
+      hash: $checkedConvert(json, 'hash', (v) => v as String),
+      imageUrl: $checkedConvert(json, 'imageUrl', (v) => v as String),
       graphName: $checkedConvert(json, 'graphName', (v) => v as String),
       relationDescription:
           $checkedConvert(json, 'relationDescription', (v) => v as String),
@@ -106,6 +98,7 @@ Map<String, dynamic> _$ResolvedGraphFromRemoteToJson(
 
   writeNotNull('graph', instance.graph);
   val['image'] = instance.image;
-  writeNotNull('imageUrl', instance.imageUrl);
+  val['imageUrl'] = instance.imageUrl;
+  val['hash'] = instance.hash;
   return val;
 }

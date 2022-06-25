@@ -40,11 +40,11 @@ class GraphImageView extends StatelessWidget {
             Container(
               width: image.size.width.toDouble(),
               // color: resolvedGraph.graph.showInPullRequest
-              color: true ? Colors.blue : Colors.transparent,
+              color: viewModel.hasChanged ? Colors.red : Colors.blue,
               child: Column(
                 children: [
                   Text(
-                    "Has Changed",
+                    viewModel.hasChanged ? "Has Changed" : "No Change",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,

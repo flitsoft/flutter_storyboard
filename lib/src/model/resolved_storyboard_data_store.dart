@@ -29,8 +29,11 @@ class GraphDataStore {
   final String graphName;
   @JsonKey()
   final String relationDescription;
+  @JsonKey()
+  final String hash;
 
   GraphDataStore({
+    required this.hash,
     required this.imageUrl,
     required this.size,
     required this.graphName,
@@ -38,8 +41,18 @@ class GraphDataStore {
     required this.children,
   });
 
-  factory GraphDataStore.fromJson(Map<String, dynamic> json) =>
-      _$ResolvedGraphDataStoreFromJson(json);
+  static GraphDataStore? fromJsonOrNull(Map<String, dynamic> json) {
+    try {
+      return _$GraphDataStoreFromJson(json);
+    } catch (e, trace) {
+      print(e);
+      print(trace);
+      return null;
+    }
+  }
 
-  Map<String, dynamic> toJson() => _$ResolvedGraphDataStoreToJson(this);
+  factory GraphDataStore.fromJson(Map<String, dynamic> json) =>
+      _$GraphDataStoreFromJson(json);
+
+  Map<String, dynamic> toJson() => _$GraphDataStoreToJson(this);
 }

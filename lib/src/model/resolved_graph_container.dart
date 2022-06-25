@@ -116,6 +116,10 @@ class ResolvedGraphContainerWithBoth {
   @JsonKey()
   List<ResolvedGraphContainer> children;
 
+  bool get hasChanged {
+    return local.hash != remote.hash;
+  }
+
   ResolvedGraphContainerWithBoth({
     required this.local,
     required this.remote,

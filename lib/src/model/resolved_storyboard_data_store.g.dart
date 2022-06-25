@@ -22,9 +22,10 @@ Map<String, dynamic> _$StoryScreenSizeToJson(StoryScreenSize instance) =>
       'height': instance.height,
     };
 
-GraphDataStore _$ResolvedGraphDataStoreFromJson(Map json) {
-  return $checkedNew('ResolvedGraphDataStore', json, () {
+GraphDataStore _$GraphDataStoreFromJson(Map json) {
+  return $checkedNew('GraphDataStore', json, () {
     final val = GraphDataStore(
+      hash: $checkedConvert(json, 'hash', (v) => v as String),
       imageUrl: $checkedConvert(json, 'imageUrl', (v) => v as String),
       size: $checkedConvert(json, 'size',
           (v) => StoryScreenSize.fromJson(Map<String, dynamic>.from(v as Map))),
@@ -43,11 +44,12 @@ GraphDataStore _$ResolvedGraphDataStoreFromJson(Map json) {
   });
 }
 
-Map<String, dynamic> _$ResolvedGraphDataStoreToJson(GraphDataStore instance) =>
+Map<String, dynamic> _$GraphDataStoreToJson(GraphDataStore instance) =>
     <String, dynamic>{
       'children': instance.children.map((e) => e.toJson()).toList(),
       'imageUrl': instance.imageUrl,
       'size': instance.size.toJson(),
       'graphName': instance.graphName,
       'relationDescription': instance.relationDescription,
+      'hash': instance.hash,
     };

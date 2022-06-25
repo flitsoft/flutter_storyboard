@@ -100,12 +100,10 @@ class StoryBoardState extends State<StoryBoard> {
                 child: Container(
                   // height: screenheight,
                   color: Colors.red,
-                  child: controller.resolvedGraphRoot == null
-                      ? Container()
-                      : GraphBuilder(
-                          controller: controller,
-                          resolvedGraph: controller.resolvedGraphRoot,
-                        ),
+                  child: GraphBuilder(
+                    controller: controller,
+                    resolvedGraph: controller.resolvedGraphRoot,
+                  ),
                 ),
               ),
             ),

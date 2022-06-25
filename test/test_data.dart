@@ -89,10 +89,10 @@ class _CounterAppState extends State<CounterApp> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '${counter}',
-                style: Theme.of(context).textTheme.display1,
+                '$counter',
+                style: Theme.of(context).textTheme.headline4,
               ),
-              RaisedButton(
+              ElevatedButton(
                 onPressed: () => counter++,
                 child: Text("Increment"),
               )
@@ -107,21 +107,25 @@ class _CounterAppState extends State<CounterApp> {
 final url =
     "https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b";
 final resolvedGraphUrl = GraphDataStore(
+  hash: "",
   imageUrl: url,
   graphName: 'ContainerLoading',
   relationDescription: 'Root tap tap',
   children: [
     GraphDataStore(
+      hash: "",
       imageUrl: url,
       graphName: 'SplashPageLoading',
       relationDescription: 'root',
       children: [
         GraphDataStore(
+          hash: "",
           imageUrl: url,
           graphName: 'LanguageSignUpPage',
           relationDescription: 'root tap tap',
           children: [
             GraphDataStore(
+              hash: "",
               imageUrl: url,
               graphName: 'ShowMoreLanguageClick',
               relationDescription: 'root tap tap',
@@ -132,16 +136,19 @@ final resolvedGraphUrl = GraphDataStore(
           size: StoryScreenSize(411.4, 740.0),
         ),
         GraphDataStore(
+          hash: "",
           imageUrl: url,
           graphName: 'OnBoardingLoading',
           relationDescription: 'root tap tap',
           children: [
             GraphDataStore(
+              hash: "",
               imageUrl: url,
               graphName: 'DragToConfirmYourDriver',
               relationDescription: 'root tap tap',
               children: [
                 GraphDataStore(
+                  hash: "",
                   imageUrl: url,
                   graphName: 'DragToTrackYourRide',
                   relationDescription: 'root tap tap',

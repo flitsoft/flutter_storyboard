@@ -5,6 +5,7 @@ import 'dart:ui' as ui;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
+import 'package:crypto/crypto.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -70,7 +71,7 @@ class StoryBoardController {
     final img = await graphAreaScreenshotCtrl.takeFlutterScreenShoot();
     print("Saving all graph $img");
     if (img == null) return;
-    final dialog = showDialog(
+    final _ = showDialog(
       context: view.context,
       builder: (contet) {
         return AlertDialog(
@@ -137,6 +138,51 @@ class StoryBoardController {
     await _saveGiantScreenshot(byteList);
   }
 
+  Widget _getSpotLight(StoryboardGraph graph, BaseStoryScreen<dynamic> story) {
+    if (graph.enabled == false) {
+      return _rootWidget(
+        key: _getNewKey(story),
+        home: Center(
+          child: Text(
+            "Disabled (${graph.children.length})",
+          ),
+        ),
+      );
+    }
+    return _rootWidget(key: _getNewKey(story), home: story.widget);
+  }
+
+  Future<void> _arrangeAfterBuild(
+      StoryboardGraph graph, BaseStoryScreen<dynamic> story) async {
+    if (!graph.enabled) return;
+    this.view.applyState();
+    // In some cases, widget is not built until here
+    // and initState has not been called,
+    // hence you may get initialization errors for late variables
+    // Test Case [CarPageTapNext] in driver enrolment
+    await Future.delayed(Duration(milliseconds: 500));
+    try {
+      print("Before arrange after build");
+      await story.arrangeAfterBuild();
+      print("After arrange after build");
+    } catch (e, _) {
+      this.deregisterKeyboard();
+      rethrow;
+    }
+    story.printSetupTrace();
+    print("Before stage");
+    await story.stageForScreenshot();
+    print("After stage");
+  }
+
+  Future<void> _cleanUpScrenshoot(
+      StoryboardGraph graph, BaseStoryScreen<dynamic> story) async {
+    if (!graph.enabled) return;
+
+    await story.cleanSnapshotLayer();
+    print("After clean");
+  }
+
   Future<ResolvedGraphFromBuild?> putOnSpotLight(StoryboardGraph graph) async {
     currentGraph = graph;
     final story = graph.story;
@@ -154,39 +200,9 @@ class StoryBoardController {
     story.delegate =
         StoryBoardDelegate(translator: view.widget.translator, driver: driver);
 
-    if (graph.enabled == false) {
-      spotLight = _rootWidget(
-        key: _getNewKey(story),
-        home: Center(
-          child: Text(
-            "Disabled (${graph.children.length})",
-          ),
-        ),
-      );
+    spotLight = _getSpotLight(graph, story);
 
-      this.view.applyState();
-      return core.resolveGraph(graph);
-    } else {
-      spotLight = _rootWidget(key: _getNewKey(story), home: story.widget);
-    }
-    this.view.applyState();
-    // In some cases, widget is not built until here
-    // and initState has not been called,
-    // hence you may get initialization errors for late variables
-    // Test Case [CarPageTapNext] in driver enrolment
-    await Future.delayed(Duration(milliseconds: 500));
-    try {
-      print("Before arrange after build");
-      await story.arrangeAfterBuild();
-      print("After arrange after build");
-    } catch (e, trace) {
-      this.deregisterKeyboard();
-      rethrow;
-    }
-    story.printSetupTrace();
-    print("Before stage");
-    await story.stageForScreenshot();
-    print("After stage");
+    await _arrangeAfterBuild(graph, story);
 
     this.view.applyState();
     final ResolvedGraphFromBuild? resolvedGraph =
@@ -194,9 +210,7 @@ class StoryBoardController {
     print("$logTrace After resoved");
 
     if (resolvedGraph == null) return null;
-
-    await story.cleanSnapshotLayer();
-    print("After clean");
+    await _cleanUpScrenshoot(graph, story);
 
     return resolvedGraph;
   }
@@ -230,8 +244,10 @@ class StoryBoardController {
 
   GraphBuilderViewModel? viewModel(ResolvedGraphContainer resolvedGraph) {
     int? imageId;
-    final isOverriding =
-        ResolvedGraphContainerWithBoth.castFrom(resolvedGraph) != null;
+    final graphWithBoth =
+        ResolvedGraphContainerWithBoth.castFrom(resolvedGraph);
+    final isOverriding = graphWithBoth != null;
+
     final resolvedGraphLocal =
         ResolvedGraphContainerWithLocal.castFrom(resolvedGraph);
     if (resolvedGraphLocal != null) {
@@ -244,6 +260,7 @@ class StoryBoardController {
         description: locale.relationDescription,
         title: locale.graphName,
         overriding: isOverriding,
+        hasChanged: graphWithBoth?.hasChanged ?? false,
       );
     }
     final resolvedGraphWithRemote =
@@ -258,24 +275,10 @@ class StoryBoardController {
         description: remote.relationDescription,
         title: remote.graphName,
         overriding: isOverriding,
+        hasChanged: graphWithBoth?.hasChanged ?? false,
       );
     }
     return null;
-  }
-
-  List<ResolvedGraphContainer> _getSiblings(ResolvedGraphContainer? parent) {
-    final resolvedGraphRootLocal = resolvedGraphRoot;
-
-    final List<ResolvedGraphContainer> siblings = [];
-    if (parent == null && resolvedGraphRootLocal != null) {
-      siblings.add(resolvedGraphRootLocal);
-      return siblings;
-    }
-    if (parent == null) {
-      return siblings;
-    }
-    siblings.addAll(parent.children);
-    return siblings;
   }
 
   void deregisterKeyboard() {
@@ -286,7 +289,7 @@ class StoryBoardController {
     driver.testTextInput.register();
   }
 
-  Future<UploadTask?> getUploadTask(ImageWidgetData image) async {
+  Future<UploadTaskWitUrl?> getUploadTask(ImageWidgetData image) async {
     if (view.widget.saveRun != true) return null;
     final img = (image.image as UIImage).image;
     final bytes = await _convertImageToBytes(img);
@@ -297,11 +300,13 @@ class StoryBoardController {
     return Future.value(uploadTask);
   }
 
-  UploadTask _saveInvidivualScreenCaptureAsync(Uint8List byteList) {
+  UploadTaskWitUrl _saveInvidivualScreenCaptureAsync(Uint8List byteList) {
     final fileName =
         "Story-Image-Screenshots${DateTime.now().millisecondsSinceEpoch}";
     final UploadTask uploadTask = _uploadData(byteList, fileName);
-    return uploadTask;
+    final task = UploadTaskWitUrl(uploadTask);
+    task.start();
+    return task;
   }
 
   Future<ImageWidgetData?> takeFlutterScreenShoot() async {
@@ -340,7 +345,7 @@ class StoryBoardController {
   Future<void> _trySaveDataStore() async {
     print('$logTrace _trySaveDataStore');
     if (!isCI() && view.widget.saveRun == false) return null;
-    await Future.wait(core.uploadTasks.values);
+    await Future.wait(core.uploadTasks.values.map((e) => e.completer.future));
     print('$logTrace all images screen uploaded');
 
     final rootLocal = core.resolvedGraphRoot.children
@@ -363,7 +368,7 @@ class StoryBoardController {
     final documentData = await _docRoot().get();
     final json = documentData.data();
     if (json == null) return null;
-    return GraphDataStore.fromJson(json);
+    return GraphDataStore.fromJsonOrNull(json);
   }
 
   Future<void> saveDatastore(GraphDataStore data) async {
@@ -383,11 +388,11 @@ class StoryBoardController {
     final uploadTask =
         core.uploadTasks[resolvedGraphFromLocalWithUploadTask.uploadTask];
     if (uploadTask == null) return null;
-    final taskSnapshot = await uploadTask;
-    final url = await taskSnapshot.ref.getDownloadURL();
+    final url = await uploadTask.completer.future;
     final image = this.lookupGraphLocale(resolvedGraph)?.image;
     if (image == null) return null;
     final data = GraphDataStore(
+      hash: resolvedGraphWithLocal.local.hash,
       imageUrl: url,
       size: image.size,
       graphName: resolvedGraphWithLocal.local.graphName,
@@ -409,6 +414,71 @@ class StoryBoardController {
     print("$logTrace reading datastore ${datastore?.toJson()}");
     this.graphStoreData = datastore;
   }
+
+  Future<String> generateImageHash(List<int> bytes) async {
+    String digest = sha256.convert(bytes).toString();
+    return digest;
+  }
+
+  Future<String?> computeImageHash(ImageWidgetData imageLocal) async {
+    final image = (imageLocal.image as UIImage).image;
+    final imageBytes = await _convertImageToBytes(image);
+    if (imageBytes == null) return null;
+    final start = DateTime.now();
+    // final url = graphWithBoth.remote.imageUrl;
+    // final networkResult = await compareImages(
+    //     src1: imageBytes.toList(),
+    //     src2: imageBytes.toList(),
+    //     algorithm: PixelMatching(ignoreAlpha: true));
+
+    var result = await compute(generateImageHash, imageBytes.toList());
+    final end = DateTime.now();
+    print(
+        "Difference is $result. Took ${end.millisecondsSinceEpoch - start.millisecondsSinceEpoch}");
+    return result;
+  }
+
+  Future<void> compareImageChange(ResolvedGraphContainer resolvedGraph) async {
+    final graphWithBoth =
+        ResolvedGraphContainerWithBoth.castFrom(resolvedGraph);
+    if (graphWithBoth == null) return;
+
+    print(
+        "Difference ${graphWithBoth.local.hash == graphWithBoth.remote.hash}");
+    return;
+
+    final imageLocal = this.lookupGraphLocale(resolvedGraph)?.image;
+    if (imageLocal == null) return null;
+    final imageRemote = this.lookupGraphRemote(resolvedGraph)?.image;
+    if (imageRemote == null) return null;
+    final image = (imageLocal.image as UIImage).image;
+    final imageBytes = await _convertImageToBytes(image);
+    if (imageBytes == null) return;
+    final start = DateTime.now();
+    // final url = graphWithBoth.remote.imageUrl;
+    // final networkResult = await compareImages(
+    //     src1: imageBytes.toList(),
+    //     src2: imageBytes.toList(),
+    //     algorithm: PixelMatching(ignoreAlpha: true));
+
+    var result = await compute(generateImageHash, imageBytes.toList());
+    var result1 = await compute(generateImageHash, imageBytes.toList());
+    final end = DateTime.now();
+    print(
+        "Difference is $result $result1. Took ${end.millisecondsSinceEpoch - start.millisecondsSinceEpoch}");
+  }
+
+  // void compareImageWithDiff(ResolvedGraphContainer preBuiltResolvedGraph) {
+  //   try {
+  //     var diff = await DiffImage.compareFromUrl(
+  //       FIRST_IMAGE,
+  //       SECOND_IMAGE,
+  //     );
+  //     print('The difference between images is: ${diff.value} %');
+  //   } catch(e) {
+  //     print(e);
+  //   }
+  // }
 }
 
 extension StoryBoardControllerAction on StoryBoardController {
@@ -487,3 +557,8 @@ extension StoryBoardControllerAction on StoryBoardController {
     return graphRemote;
   }
 }
+
+///
+/// 6681-7110 ChiSquareDistanceHistogram
+/// 6496-7249 IntersectionHistogram
+/// 5609-7249 PixelMatching
