@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:ui';
 import 'dart:ui' as ui;
@@ -15,12 +16,14 @@ import 'package:flutter_storyboard/src/model/graph_shallow_reference.dart';
 import 'package:flutter_storyboard/src/model/resolved_graph.dart';
 import 'package:flutter_storyboard/src/model/resolved_graph_container.dart';
 import 'package:flutter_storyboard/src/model/resolved_storyboard_data_store.dart';
+import 'package:flutter_storyboard/src/model/runner_model.dart';
 import 'package:flutter_storyboard/src/model/storyboard_graph.dart';
 import 'package:flutter_storyboard/src/model/storyboard_model.dart';
 import 'package:flutter_storyboard/src/model/view/graph_builder_view_model.dart';
 import 'package:flutter_storyboard/src/storyboard_delegate.dart';
 import 'package:flutter_storyboard/src/utils/automation_ui.dart';
 import 'package:flutter_storyboard/src/utils/internal_utils.dart';
+import 'package:flutter_storyboard/src/utils/runner_connector.dart';
 import 'package:flutter_storyboard/src/utils/screenshotable.dart';
 import 'package:flutter_storyboard/src/utils/services/clock_service.dart';
 import 'package:flutter_storyboard/src/utils/ui_image_widget.dart';
@@ -110,16 +113,18 @@ class StoryBoardController {
         " ${uriData.length} saved!!");
   }
 
-  Future<void> _uploadAndDownloadUrlText(Uint8List byteList) async {
+  Future<String> _uploadAndDownloadUrlText(Uint8List byteList) async {
     final fileName =
         "PR-Image-Screenshots${DateTime.now().millisecondsSinceEpoch}";
     final UploadTask uploadTask = _uploadData(byteList, fileName);
     final answer = await uploadTask;
     final url = await answer.ref.getDownloadURL();
-    print("$urlWithIsShowInPrKey=>$url=>${showFlowInPullRequest.toString()}");
     await GoogleMapsWebScreenshot.instance.downloadFile(
-        """<img width="1680" alt="$fileName" src="$url">""", "url.txt");
+      """<img width="1680" alt="$fileName" src="$url">""",
+      "url.txt",
+    );
     await Future.delayed(Duration(seconds: 5));
+    return url;
   }
 
   Future<Uint8List?> _convertImageToBytes(ui.Image img) async {
@@ -327,12 +332,8 @@ class StoryBoardController {
   Future<void> _saveGiantScreenshot(Uint8List byteList) async {
     if (!isCI()) return;
 
-    String relationDescription =
-        view.widget.graphForCiAuto?.relationDescription ??
-            "graphForCiAuto is null";
-    print("$storyboardKey $relationDescription");
-
-    await _uploadAndDownloadUrlText(byteList);
+    final url = await _uploadAndDownloadUrlText(byteList);
+    _printReportToCi(url);
     _tryPop();
   }
 
@@ -466,6 +467,87 @@ class StoryBoardController {
     final end = DateTime.now();
     print(
         "Difference is $result $result1. Took ${end.millisecondsSinceEpoch - start.millisecondsSinceEpoch}");
+  }
+
+  void _printReportToCi(String url) {
+    String relationDescription = graphData.relationDescription;
+    ScreenDiffReport diffReport = _generateScreenDiffReport();
+    final storyboardComplete = StoryboardComplete(
+      imageUrl: url,
+      title: relationDescription,
+      showFlowInPullRequest: showFlowInPullRequest,
+      screenDiff: diffReport.screenDiff,
+      addedCount: diffReport.addedCount,
+      screenCount: diffReport.screenCount,
+      deletedCount: diffReport.deletedCount,
+      modifiedCount: diffReport.modifiedCount,
+    );
+    final payload = storyboardComplete.toJson();
+    final payloadString = jsonEncode(payload);
+    RunnerConnector.sendMessage(STORYBOARD_RUNNER_COMPLETE, payloadString);
+  }
+
+  ScreenDiffReport _generateScreenDiffReport() {
+    final report = ScreenDiffReport(
+      addedCount: 0,
+      deletedCount: 0,
+      modifiedCount: 0,
+      screenCount: 0,
+      screenDiff: [],
+    );
+    _recurseForReport(resolvedGraphRoot, report);
+    return report;
+  }
+
+  void _recurseForReport(
+    ResolvedGraphContainer resolvedGraph,
+    ScreenDiffReport report,
+  ) {
+    report.screenCount++;
+    final graphWithBoth =
+        ResolvedGraphContainerWithBoth.castFrom(resolvedGraph);
+    if (graphWithBoth != null && graphWithBoth.hasChanged) {
+      final diff = StoryboardScreenDifference(
+        urlBefore: graphWithBoth.remote.imageUrl,
+        urlAfter: graphWithBoth.remote.imageUrl,
+        steps: _traceParents(graphWithBoth).map((e) {
+          return StoryScreenDetail(
+            graphName: e.storyName,
+            relationDescription: e.relationDescription,
+          );
+        }).toList(),
+      );
+      report.screenDiff.add(diff);
+      report.modifiedCount++;
+    }
+    if (resolvedGraph.local != null && resolvedGraph.remote == null) {
+      report.addedCount++;
+    }
+    if (resolvedGraph.local == null && resolvedGraph.remote != null) {
+      report.deletedCount++;
+    }
+
+    for (final child in resolvedGraph.children) {
+      _recurseForReport(child, report);
+    }
+  }
+
+  List<StoryboardGraph> _traceParents(ResolvedGraphContainerWithBoth local) {
+    int graphHash = local.local.graph;
+    List<StoryboardGraph> parent = [];
+    final current = this.core.graphMap[graphHash];
+    if (current != null) parent.add(current);
+
+    StoryboardGraph? storyboardGraphParent;
+    while (storyboardGraphParent == null ||
+        storyboardGraphParent != this.core.storyboardGraphRoot) {
+      storyboardGraphParent = this.core.graphParentMap[graphHash];
+      if (storyboardGraphParent == null) break;
+      parent.add(storyboardGraphParent);
+      graphHash = storyboardGraphParent.hashCode;
+    }
+
+    return parent.reversed.toList();
   }
 
   // void compareImageWithDiff(ResolvedGraphContainer preBuiltResolvedGraph) {

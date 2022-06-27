@@ -3,7 +3,9 @@ import 'dart:js_util';
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_storyboard/src/constants/git_runner_key.dart';
 import 'package:flutter_storyboard/src/utils/internal_utils.dart';
+import 'package:flutter_storyboard/src/utils/runner_connector.dart';
 import 'package:flutter_storyboard/src/utils/web/google_maps_snapshot.dart';
 import 'package:flutter_storyboard/src/utils/web/google_maps_snapshot_interop.dart';
 
@@ -36,7 +38,7 @@ class GoogleMapsWebScreenshotImpl implements GoogleMapsWebScreenshot {
 
   @override
   void exit() {
-    print("Window.closing");
+    RunnerConnector.sendMessage(CLOSE_STORYBOARD, "");
     SystemChannels.platform.invokeMethod('SystemNavigator.pop');
     window.close();
     close();

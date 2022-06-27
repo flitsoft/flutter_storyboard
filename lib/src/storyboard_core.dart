@@ -18,12 +18,20 @@ class StoryboardCore {
 
   Map<int, ImageWidgetData> images = {};
   Map<int, UploadTaskWitUrl> uploadTasks = {};
+  StoryboardGraph storyboardGraphRoot = StoryboardGraph(
+    relationDescription: 'root',
+    story: BaseStoryScreen(),
+    children: [],
+  );
   StoryboardCore(this.parent);
   Future<void> onReady() async {
     print("$logTrace");
 
     await parent.readDataStore();
-    _flattenStoryboardGraph(parent.graphData);
+    _flattenStoryboardGraph(
+      parent.graphData,
+      storyboardGraphRoot,
+    );
 
     _resolvePrebuild();
     this.parent.applyState();
@@ -53,11 +61,14 @@ class StoryboardCore {
   }
 
   Map<int, StoryboardGraph> graphMap = {};
+  Map<int, StoryboardGraph> graphParentMap = {};
 
-  void _flattenStoryboardGraph(StoryboardGraph graphData) {
+  void _flattenStoryboardGraph(
+      StoryboardGraph graphData, StoryboardGraph graphDataParent) {
     graphMap[graphData.hashCode] = graphData;
+    graphParentMap[graphData.hashCode] = graphDataParent;
     for (final child in graphData.children) {
-      _flattenStoryboardGraph(child);
+      _flattenStoryboardGraph(child, graphData);
     }
   }
 

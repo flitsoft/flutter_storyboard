@@ -1,2 +1,3 @@
-const String storyboardKey = "storyboardKey";
-const String urlWithIsShowInPrKey = 'urlWithIsShowInPrKey';
+const String STORYBOARD_RUNNER_COMPLETE = "STORYBOARD_RUNNER_COMPLETE";
+const String STORYBOARD_EVENT_KEY = "[STORYBOARD_EVENT]";
+const String CLOSE_STORYBOARD = "Window.closing";
