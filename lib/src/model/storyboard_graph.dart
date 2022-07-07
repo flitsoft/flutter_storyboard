@@ -20,6 +20,8 @@ class StoryboardGraph {
     required this.children,
   });
 
+  /// Method used for unit testing purpose
+  /// assertion deep equality in json
   Map<String, dynamic> toJson() {
     final instance = this;
     final val = <String, dynamic>{};

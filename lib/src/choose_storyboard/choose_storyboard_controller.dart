@@ -1,9 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_storyboard/src/choose_storyboard/choose_storyboard_page.dart';
 import 'package:flutter_storyboard/src/model/storyboard_graph.dart';
+import 'package:flutter_storyboard/src/model/storyboard_model.dart';
 import 'package:flutter_storyboard/src/utils/util.dart';
 import 'package:flutter_storyboard/src/utils/web/google_maps_snapshot.dart';
 import 'package:flutter_storyboard/src/view/storyboard_view.dart';
+
+class ContainerStoryScreen extends BaseStoryScreen implements StoryScreen {
+  late Widget widget;
+
+  @override
+  void init() {
+    widget = Scaffold(
+      body: Center(
+        child: Text("ROOT"),
+      ),
+    );
+  }
+}
 
 class ChooseStoryBoardController {
   late ChooseStoryBoardPageState view;
@@ -14,6 +28,14 @@ class ChooseStoryBoardController {
     view = _state;
   }
 
+  StoryboardGraph wrap(List<StoryboardGraph> children) {
+    return StoryboardGraph(
+      relationDescription: 'root',
+      story: ContainerStoryScreen(),
+      children: children,
+    );
+  }
+
   void onStoryboardRunTapped() {
     Navigator.push(
       view.context,
@@ -22,7 +44,7 @@ class ChooseStoryBoardController {
           saveRun: saveRun,
           translator: view.widget.translator,
           onMockEmAll: view.widget.onMockEmAll,
-          graphForStoryboard: view.widget.graphForStoryboard,
+          graphForStoryboard: wrap(view.widget.graphForStoryboard.children),
           widgetParent: view.widget.widgetParent,
         ),
       ),
@@ -49,7 +71,7 @@ class ChooseStoryBoardController {
           builder: (context) => StoryBoard(
             saveRun: true,
             translator: view.widget.translator,
-            graphForCiAuto: graph,
+            graphForStoryboard: wrap([graph]),
             onMockEmAll: view.widget.onMockEmAll,
             widgetParent: view.widget.widgetParent,
           ),

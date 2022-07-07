@@ -217,6 +217,8 @@ class StoryboardCore {
     return resolvedGraphRootToJsonRecursive(this.resolvedGraphRoot, json);
   }
 
+  /// Method used for unit testing purpose
+  /// assertion deep equality in json
   Map<String, dynamic> resolvedGraphRootToJsonRecursive(
       ResolvedGraphContainer resolvedGraph, Map<String, dynamic> json) {
     final locale = parent.lookupGraphLocale(resolvedGraph);

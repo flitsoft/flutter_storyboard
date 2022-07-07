@@ -23,7 +23,7 @@ import 'package:flutter_storyboard/src/model/view/graph_builder_view_model.dart'
 import 'package:flutter_storyboard/src/storyboard_delegate.dart';
 import 'package:flutter_storyboard/src/utils/automation_ui.dart';
 import 'package:flutter_storyboard/src/utils/internal_utils.dart';
-import 'package:flutter_storyboard/src/utils/runner_connector.dart';
+import 'package:flutter_storyboard/src/utils/runner_messenger.dart';
 import 'package:flutter_storyboard/src/utils/screenshotable.dart';
 import 'package:flutter_storyboard/src/utils/services/clock_service.dart';
 import 'package:flutter_storyboard/src/utils/ui_image_widget.dart';
@@ -333,11 +333,12 @@ class StoryBoardController {
     if (!isCI()) return;
 
     final url = await _uploadAndDownloadUrlText(byteList);
-    _printReportToCi(url);
+    await _printReportToCi(url);
     _tryPop();
   }
 
   void _tryPop() {
+    print("$logTrace Trying to close");
     if (!isCI()) return;
     // final unawaited = _downloadImage(byteList);
     Navigator.of(view.context).pop();
@@ -469,7 +470,7 @@ class StoryBoardController {
         "Difference is $result $result1. Took ${end.millisecondsSinceEpoch - start.millisecondsSinceEpoch}");
   }
 
-  void _printReportToCi(String url) {
+  Future<void> _printReportToCi(String url) async {
     String relationDescription = graphData.relationDescription;
     ScreenDiffReport diffReport = _generateScreenDiffReport();
     final storyboardComplete = StoryboardComplete(
@@ -484,7 +485,8 @@ class StoryBoardController {
     );
     final payload = storyboardComplete.toJson();
     final payloadString = jsonEncode(payload);
-    RunnerConnector.sendMessage(STORYBOARD_RUNNER_COMPLETE, payloadString);
+    await RunnerMessenger.sendMessage(
+        STORYBOARD_RUNNER_COMPLETE, payloadString);
   }
 
   ScreenDiffReport _generateScreenDiffReport() {
@@ -575,11 +577,7 @@ extension StoryBoardControllerAction on StoryBoardController {
   }
 
   void startUp() {
-    final widgetGraphData =
-        view.widget.graphForCiAuto ?? view.widget.graphForStoryboard;
-    if (widgetGraphData == null) {
-      throw Exception("Graph data cannot be null");
-    }
+    final widgetGraphData = view.widget.graphForStoryboard;
     graphData = widgetGraphData;
     core.onReady();
   }

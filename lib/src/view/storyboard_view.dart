@@ -15,16 +15,14 @@ import 'package:flutter_storyboard/src/utils/static_utils.dart';
 import 'package:flutter_storyboard/src/view/graph_builder.dart';
 
 class StoryBoard extends StatefulWidget {
-  final StoryboardGraph? graphForCiAuto;
-  final StoryboardGraph? graphForStoryboard;
+  final StoryboardGraph graphForStoryboard;
   final Function onMockEmAll;
   final String Function(dynamic stringCode) translator;
   final Widget Function(Key? key, Widget home) widgetParent;
   final bool saveRun;
   const StoryBoard({
     Key? key,
-    this.graphForCiAuto,
-    this.graphForStoryboard,
+    required this.graphForStoryboard,
     required this.translator,
     required this.onMockEmAll,
     required this.widgetParent,
