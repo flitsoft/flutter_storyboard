@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'dart:ui';
 import 'dart:ui' as ui;
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:crypto/crypto.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -20,6 +19,7 @@ import 'package:flutter_storyboard/src/model/runner_model.dart';
 import 'package:flutter_storyboard/src/model/storyboard_graph.dart';
 import 'package:flutter_storyboard/src/model/storyboard_model.dart';
 import 'package:flutter_storyboard/src/model/view/graph_builder_view_model.dart';
+import 'package:flutter_storyboard/src/services/storyboard_repository.dart';
 import 'package:flutter_storyboard/src/storyboard_delegate.dart';
 import 'package:flutter_storyboard/src/utils/automation_ui.dart';
 import 'package:flutter_storyboard/src/utils/internal_utils.dart';
@@ -42,6 +42,7 @@ class StoryBoardController {
   final spotLightScreenshotCtrl = ScreenshotController();
   final graphAreaScreenshotCtrl = ScreenshotController();
 
+  final storyboardRepo = StoryboardRepository();
   Map<int, ImageWidgetData> get images => core.images;
   Map<int, StoryboardGraph> get graphMap => core.graphMap;
   StoryboardGraph? currentGraph;
@@ -355,27 +356,7 @@ class StoryBoardController {
     if (rootLocal == null) return;
     final data = await _recurseGraphRootLocalToDataStore(rootLocal);
     if (data == null) return;
-    await saveDatastore(data);
-  }
-
-  DocumentReference<Map<String, dynamic>> _docRoot() {
-    return FirebaseFirestore.instance
-        .collection('databases')
-        .doc('storyboard')
-        .collection('datastore')
-        .doc('tolotra');
-  }
-
-  Future<GraphDataStore?> read() async {
-    final documentData = await _docRoot().get();
-    final json = documentData.data();
-    if (json == null) return null;
-    return GraphDataStore.fromJsonOrNull(json);
-  }
-
-  Future<void> saveDatastore(GraphDataStore data) async {
-    print('$logTrace Saving Ride ${data.toJson()}');
-    await _docRoot().set(data.toJson());
+    await storyboardRepo.saveDatastore(data);
   }
 
   Future<GraphDataStore?> _recurseGraphRootLocalToDataStore(
@@ -412,7 +393,7 @@ class StoryBoardController {
   }
 
   Future<void> readDataStore() async {
-    final datastore = await read();
+    final datastore = await storyboardRepo.read();
     print("$logTrace reading datastore ${datastore?.toJson()}");
     this.graphStoreData = datastore;
   }
