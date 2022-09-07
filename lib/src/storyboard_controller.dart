@@ -358,7 +358,8 @@ class StoryBoardController {
     if (data == null) return;
     String featureBranch = "feature/debug-proxy-charles";
     if (isCI()) {
-      featureBranch = String.fromEnvironment(STORYBOARD_FEATURE_BRANCH_NAME);
+      featureBranch =
+          const String.fromEnvironment(STORYBOARD_FEATURE_BRANCH_NAME);
     }
     await storyboardRepo.saveDatastore(data, featureBranch);
   }
@@ -399,7 +400,7 @@ class StoryBoardController {
   Future<void> readDataStore() async {
     String branch = "master";
     if (isCI()) {
-      branch = String.fromEnvironment(STORYBOARD_BASE_BRANCH_NAME,
+      branch = const String.fromEnvironment(STORYBOARD_BASE_BRANCH_NAME,
           defaultValue: "master");
     }
     final datastore = await storyboardRepo.read(branch);
