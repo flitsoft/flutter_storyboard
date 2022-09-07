@@ -1,11 +1,11 @@
 targets:
   $default:
     builders:
-#      freezed:
-#        enabled: True
-#        generate_for:
-#          - lib/model/**
-#
+      freezed:
+        enabled: True
+        generate_for:
+          - lib/src/model/**
+
 
       json_serializable:
         enabled: True

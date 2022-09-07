@@ -356,7 +356,11 @@ class StoryBoardController {
     if (rootLocal == null) return;
     final data = await _recurseGraphRootLocalToDataStore(rootLocal);
     if (data == null) return;
-    await storyboardRepo.saveDatastore(data);
+    String featureBranch = "feature/debug-proxy-charles";
+    if (isCI()) {
+      featureBranch = String.fromEnvironment(STORYBOARD_FEATURE_BRANCH_NAME);
+    }
+    await storyboardRepo.saveDatastore(data, featureBranch);
   }
 
   Future<GraphDataStore?> _recurseGraphRootLocalToDataStore(
@@ -393,9 +397,14 @@ class StoryBoardController {
   }
 
   Future<void> readDataStore() async {
-    final datastore = await storyboardRepo.read();
+    String branch = "master";
+    if (isCI()) {
+      branch = String.fromEnvironment(STORYBOARD_BASE_BRANCH_NAME,
+          defaultValue: "master");
+    }
+    final datastore = await storyboardRepo.read(branch);
     print("$logTrace reading datastore ${datastore?.toJson()}");
-    this.graphStoreData = datastore;
+    this.graphStoreData = datastore?.data;
   }
 
   Future<String> generateImageHash(List<int> bytes) async {
