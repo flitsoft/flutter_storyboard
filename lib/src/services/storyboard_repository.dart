@@ -141,4 +141,18 @@ class StoryboardRepository {
   Future<void> saveGraphFlow(GraphFlowContainer graphDataFlow) async {
     await _docRoot().doc(graphDataFlow.id).set(graphDataFlow.toJson());
   }
+
+  Future<void> saveGraphFlowAtBranch(
+    GraphFlowContainer newData,
+    String branchName,
+  ) async {
+    final existingDataFlowContainer = await readGraphFlow(branchName);
+    String id = _generateId(branchName);
+    if (existingDataFlowContainer != null) {
+      id = existingDataFlowContainer.id;
+    }
+    await this.saveGraphFlow(
+      newData.copyWith(id: id, updatedAt: DateTime.now().toIso8601String()),
+    );
+  }
 }

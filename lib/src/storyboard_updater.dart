@@ -18,7 +18,7 @@ class StoryboardUpdater {
     }
     ;
     final newData = data.copyWith(branchName: baseBranch);
-    await repo.saveGraphFlow(newData);
+    await repo.saveGraphFlowAtBranch(newData, baseBranch);
     RunnerMessenger.sendMessage(BASE_BRANCH_UPDATED, "");
   }
 }
