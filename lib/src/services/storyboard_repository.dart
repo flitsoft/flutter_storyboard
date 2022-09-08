@@ -46,10 +46,12 @@ class StoryboardRepository {
   ) async {
     final documentData = await _docRoot()
         .where("branchName", isEqualTo: branchName)
-        .where("storyboardFlows.$storyboardFlow", isNull: false)
         .limit(1)
         .get();
-    return await this.parseGraphFlowReading(documentData);
+    final flowContainer = await this.parseGraphFlowReading(documentData);
+    if (flowContainer == null) return null;
+    if (flowContainer.storyboardFlows[storyboardFlow] == null) return null;
+    return flowContainer;
   }
 
   Future<GraphDataContainer?> readDataContainer(
