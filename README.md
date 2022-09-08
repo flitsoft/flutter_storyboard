@@ -50,3 +50,98 @@ flutter packages pub run build_runner build
 ```
 flutter pub run build_runner build --delete-conflicting-outputs
 ```
+
+
+### Guideline 
+
+#### Dummy Data Immutability
+
+- Use Freezed and JsonSerializable package for every model.
+- Test Dummy model are shared between StoryScreen should be immutable
+
+Bad: Lists are mutable
+
+```
+final dummyDealSection = DealSection(
+  highLights: [],
+  details: [],
+  other: [],
+  listingPrice: [],
+);
+```
+Good: Use unmodifiable list. This will not cause compile time error, but at least will cause runtime error if a story screen is mutating them
+
+```
+final dummyDealSection = DealSection(
+  highLights: List.unmodifiable([]),
+  details: List.unmodifiable([]),
+  other: List.unmodifiable([]),
+  listingPrice: List.unmodifiable([]),
+);
+```
+
+Bad: `dummyDeal` is shared between multiple story screens. Even if the properties are `final`, List are still mutable (or will cause runtime error you made them unmodifiable
+
+
+```
+class BulletPageHighLightStoryScreen extends BaseStoryScreen
+    implements StoryScreen {
+  late Widget widget;
+
+  @override
+  void init() {
+    widget = BulletPage(
+      deal: dummyDeal,
+      sectionIndex: 0,
+    );
+  }
+  ...
+}
+```
+Good: Deep close the dummy data at every StoryScreen initiation
+
+
+```
+class BulletPageHighLightStoryScreen extends BaseStoryScreen
+    implements StoryScreen {
+  late Widget widget;
+
+  @override
+  void init() {
+    widget = BulletPage(
+      deal: dummyDeal.deepClone(),
+      sectionIndex: 0,
+    );
+  }
+  ...
+}
+```
+
+You can leverage json Seriaziable to achieve that
+
+```
+
+@freezed
+class Deal with _$Deal {
+  const Deal._(); // Added  constructor
+
+  @JsonSerializable(
+    ignoreUnannotated: true,
+    includeIfNull: false,
+    explicitToJson: true,
+  )
+  factory Deal({
+    @JsonKey() required final String id,
+    @JsonKey() required final String title,
+    @JsonKey() required final String description,
+    @JsonKey() required final String createdAt,
+    @JsonKey() required final List<Photos> photos,
+    @JsonKey() required final DealSection section,
+  }) = _Deal;
+
+  factory Deal.fromJson(Map<String, dynamic> json) => _$DealFromJson(json);
+  Deal deepCopy() {
+    return Deal.fromJson(this.toJson());
+  }
+}
+```
