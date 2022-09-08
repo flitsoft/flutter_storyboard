@@ -7,5 +7,6 @@ class RunnerMessenger {
   static sendMessage(String msgId, String payloadString) async {
     await Future.delayed(Duration(milliseconds: 1));
     print("$STORYBOARD_EVENT_KEY $msgId $payloadString");
+    await Future.delayed(Duration(milliseconds: 1));
   }
 }
