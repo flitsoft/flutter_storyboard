@@ -348,7 +348,8 @@ class StoryBoardController {
   Future<void> _trySaveDataStore() async {
     print('$logTrace _trySaveDataStore');
     if (!isCI() && view.widget.saveRun == false) return null;
-    await Future.wait(core.uploadTasks.values.map((e) => e.completer.future));
+    await Future.wait(
+        core.uploadTasksWithUrls.values.map((e) => e.completer.future));
     print('$logTrace all images screen uploaded');
 
     final rootLocal = core.resolvedGraphRoot.children
@@ -373,14 +374,11 @@ class StoryBoardController {
     final resolvedGraphWithLocal =
         ResolvedGraphContainerWithLocal.castFrom(resolvedGraph);
     if (resolvedGraphWithLocal == null) return null;
-    final resolvedGraphFromLocalWithUploadTask =
-        ResolvedGraphFromBuildWithUploadTask.castFrom(
-            resolvedGraphWithLocal.local);
-    if (resolvedGraphFromLocalWithUploadTask == null) return null;
-    final uploadTask =
-        core.uploadTasks[resolvedGraphFromLocalWithUploadTask.uploadTask];
-    if (uploadTask == null) return null;
-    final url = await uploadTask.completer.future;
+    final url = this.getLocalImageUploadUrl(resolvedGraphWithLocal.local);
+    if (url == null) {
+      print("Image URL is not found");
+      return null;
+    }
     final image = this.lookupGraphLocale(resolvedGraph)?.image;
     if (image == null) return null;
     final data = GraphDataStore(
@@ -399,6 +397,22 @@ class StoryBoardController {
     }
 
     return data;
+  }
+
+  String? getLocalImageUploadUrl(ResolvedGraphFromBuild resolvedGraphLocal) {
+    final resolvedGraphFromLocalWithUploadTask =
+        ResolvedGraphFromBuildWithUploadTask.castFrom(resolvedGraphLocal);
+    if (resolvedGraphFromLocalWithUploadTask == null) return null;
+
+    final uploadTask = core
+        .uploadTasksWithUrls[resolvedGraphFromLocalWithUploadTask.uploadTask];
+    if (uploadTask == null) return null;
+    // This is actually not waiting for the upload task to complete
+    // but the url should already be available
+    // it is the same as uploadTask.url
+    // final url = await uploadTask.completer.future;
+    final url = uploadTask.url;
+    return url;
   }
 
   Future<void> readDataStore() async {
@@ -507,9 +521,14 @@ class StoryBoardController {
     final graphWithBoth =
         ResolvedGraphContainerWithBoth.castFrom(resolvedGraph);
     if (graphWithBoth != null && graphWithBoth.hasChanged) {
+      final urlAfter = this.getLocalImageUploadUrl(graphWithBoth.local);
+      if (urlAfter == null) {
+        print("No url after. Please check if image is actually uploaded.");
+        return;
+      }
       final diff = StoryboardScreenDifference(
         urlBefore: graphWithBoth.remote.imageUrl,
-        urlAfter: graphWithBoth.remote.imageUrl,
+        urlAfter: urlAfter,
         steps: _traceParents(graphWithBoth).map((e) {
           return StoryScreenDetail(
             graphName: e.storyName,

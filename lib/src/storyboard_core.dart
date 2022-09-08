@@ -17,7 +17,7 @@ class StoryboardCore {
       ResolvedGraphContainer(children: []);
 
   Map<int, ImageWidgetData> images = {};
-  Map<int, UploadTaskWitUrl> uploadTasks = {};
+  Map<int, UploadTaskWitUrl> uploadTasksWithUrls = {};
   StoryboardGraph storyboardGraphRoot = StoryboardGraph(
     relationDescription: 'root',
     story: BaseStoryScreen(),
@@ -268,6 +268,6 @@ class StoryboardCore {
 
   void _saveUploadTaskIfNotNull(UploadTaskWitUrl? uploadTask) {
     if (uploadTask == null) return;
-    uploadTasks[uploadTask.hashCode] = uploadTask;
+    uploadTasksWithUrls[uploadTask.hashCode] = uploadTask;
   }
 }
