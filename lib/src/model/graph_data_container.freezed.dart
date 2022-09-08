@@ -24,7 +24,7 @@ class _$GraphDataContainerTearOff {
       {@JsonKey() required String id,
       @JsonKey() required String branchName,
       @JsonKey() required String updatedAt,
-      @JsonKey() required GraphDataStore data}) {
+      @JsonKey() required String data}) {
     return _GraphDataContainer(
       id: id,
       branchName: branchName,
@@ -50,7 +50,7 @@ mixin _$GraphDataContainer {
   @JsonKey()
   String get updatedAt => throw _privateConstructorUsedError;
   @JsonKey()
-  GraphDataStore get data => throw _privateConstructorUsedError;
+  String get data => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -67,7 +67,7 @@ abstract class $GraphDataContainerCopyWith<$Res> {
       {@JsonKey() String id,
       @JsonKey() String branchName,
       @JsonKey() String updatedAt,
-      @JsonKey() GraphDataStore data});
+      @JsonKey() String data});
 }
 
 /// @nodoc
@@ -102,7 +102,7 @@ class _$GraphDataContainerCopyWithImpl<$Res>
       data: data == freezed
           ? _value.data
           : data // ignore: cast_nullable_to_non_nullable
-              as GraphDataStore,
+              as String,
     ));
   }
 }
@@ -118,7 +118,7 @@ abstract class _$GraphDataContainerCopyWith<$Res>
       {@JsonKey() String id,
       @JsonKey() String branchName,
       @JsonKey() String updatedAt,
-      @JsonKey() GraphDataStore data});
+      @JsonKey() String data});
 }
 
 /// @nodoc
@@ -155,19 +155,20 @@ class __$GraphDataContainerCopyWithImpl<$Res>
       data: data == freezed
           ? _value.data
           : data // ignore: cast_nullable_to_non_nullable
-              as GraphDataStore,
+              as String,
     ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$_GraphDataContainer implements _GraphDataContainer {
+class _$_GraphDataContainer extends _GraphDataContainer {
   const _$_GraphDataContainer(
       {@JsonKey() required this.id,
       @JsonKey() required this.branchName,
       @JsonKey() required this.updatedAt,
-      @JsonKey() required this.data});
+      @JsonKey() required this.data})
+      : super._();
 
   factory _$_GraphDataContainer.fromJson(Map<String, dynamic> json) =>
       _$_$_GraphDataContainerFromJson(json);
@@ -183,7 +184,7 @@ class _$_GraphDataContainer implements _GraphDataContainer {
   final String updatedAt;
   @override
   @JsonKey()
-  final GraphDataStore data;
+  final String data;
 
   @override
   String toString() {
@@ -225,12 +226,13 @@ class _$_GraphDataContainer implements _GraphDataContainer {
   }
 }
 
-abstract class _GraphDataContainer implements GraphDataContainer {
+abstract class _GraphDataContainer extends GraphDataContainer {
   const factory _GraphDataContainer(
       {@JsonKey() required String id,
       @JsonKey() required String branchName,
       @JsonKey() required String updatedAt,
-      @JsonKey() required GraphDataStore data}) = _$_GraphDataContainer;
+      @JsonKey() required String data}) = _$_GraphDataContainer;
+  const _GraphDataContainer._() : super._();
 
   factory _GraphDataContainer.fromJson(Map<String, dynamic> json) =
       _$_GraphDataContainer.fromJson;
@@ -246,7 +248,7 @@ abstract class _GraphDataContainer implements GraphDataContainer {
   String get updatedAt => throw _privateConstructorUsedError;
   @override
   @JsonKey()
-  GraphDataStore get data => throw _privateConstructorUsedError;
+  String get data => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
   _$GraphDataContainerCopyWith<_GraphDataContainer> get copyWith =>

@@ -405,7 +405,7 @@ class StoryBoardController {
     }
     final datastore = await storyboardRepo.read(branch);
     print("$logTrace reading datastore ${datastore?.toJson()}");
-    this.graphStoreData = datastore?.data;
+    this.graphStoreData = datastore?.dataStore();
   }
 
   Future<String> generateImageHash(List<int> bytes) async {

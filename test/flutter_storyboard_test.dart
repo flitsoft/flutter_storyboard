@@ -39,7 +39,7 @@ class MockStoryboardController extends StoryBoardController {
 void main() {
   test(
     "Only root is resolved graph",
-    () {
+    () async {
       final controller = MockStoryboardController();
       controller.graphStoreData = resolvedGraphUrl;
       controller.graphData = StoryboardGraph(
@@ -48,7 +48,7 @@ void main() {
         children: [],
       );
       // final core = StoryboardCore(controller);
-      controller.core.onReady();
+      await controller.core.afterReadDataStore();
       expect(
         controller.core.resolvedGraphRootToJsonForTest(),
         {

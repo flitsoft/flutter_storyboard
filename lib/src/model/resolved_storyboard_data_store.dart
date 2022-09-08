@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:json_annotation/json_annotation.dart';
 
 part 'resolved_storyboard_data_store.g.dart';
@@ -55,4 +57,6 @@ class GraphDataStore {
       _$GraphDataStoreFromJson(json);
 
   Map<String, dynamic> toJson() => _$GraphDataStoreToJson(this);
+
+  String serialize() => jsonEncode(toJson());
 }

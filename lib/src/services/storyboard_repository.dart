@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_storyboard/src/model/graph_data_container.dart';
 import 'package:flutter_storyboard/src/model/resolved_storyboard_data_store.dart';
@@ -26,7 +28,7 @@ class StoryboardRepository {
   }
 
   Future<void> updateDatastore(GraphDataContainer data) async {
-    print('$logTrace Updating Data Store ${data.toJson()}');
+    print('$logTrace Updating Data Store ${jsonEncode(data.toJson())}');
     final newData = data.copyWith(updatedAt: DateTime.now().toIso8601String());
     await _docRoot().doc(data.id).update(newData.toJson());
   }
@@ -40,7 +42,7 @@ class StoryboardRepository {
       await this.addDataStore(dataStore, branchName);
     } else {
       final newData = existingData.copyWith(
-        data: dataStore,
+        data: dataStore.serialize(),
         updatedAt: DateTime.now().toIso8601String(),
       );
       await this.updateDatastore(newData);
@@ -54,7 +56,7 @@ class StoryboardRepository {
     final id = _generateId(branchName);
     final data = GraphDataContainer(
       id: id,
-      data: dataStore,
+      data: dataStore.serialize(),
       branchName: branchName,
       updatedAt: DateTime.now().toIso8601String(),
     );

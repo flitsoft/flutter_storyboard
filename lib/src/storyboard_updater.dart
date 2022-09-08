@@ -11,7 +11,9 @@ class StoryboardUpdater {
     final repo = StoryboardRepository();
     final data = await repo.read(featureBranch);
     if (data == null) return;
-    await repo.saveDatastore(data.data, baseBranch);
+    final dataStore = data.dataStore();
+    if (dataStore == null) return;
+    await repo.saveDatastore(dataStore, baseBranch);
     RunnerMessenger.sendMessage(BASE_BRANCH_UPDATED, "");
   }
 }

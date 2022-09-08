@@ -12,8 +12,7 @@ _$_GraphDataContainer _$_$_GraphDataContainerFromJson(Map json) {
       id: $checkedConvert(json, 'id', (v) => v as String),
       branchName: $checkedConvert(json, 'branchName', (v) => v as String),
       updatedAt: $checkedConvert(json, 'updatedAt', (v) => v as String),
-      data: $checkedConvert(json, 'data',
-          (v) => GraphDataStore.fromJson(Map<String, dynamic>.from(v as Map))),
+      data: $checkedConvert(json, 'data', (v) => v as String),
     );
     return val;
   });
@@ -25,5 +24,5 @@ Map<String, dynamic> _$_$_GraphDataContainerToJson(
       'id': instance.id,
       'branchName': instance.branchName,
       'updatedAt': instance.updatedAt,
-      'data': instance.data.toJson(),
+      'data': instance.data,
     };

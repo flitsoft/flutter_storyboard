@@ -28,6 +28,12 @@ class StoryboardCore {
     print("$logTrace");
 
     await parent.readDataStore();
+    await this.afterReadDataStore();
+
+    // await _saveAllGraphScreenshot();
+  }
+
+  Future<void> afterReadDataStore() async {
     _flattenStoryboardGraph(
       parent.graphData,
       storyboardGraphRoot,
@@ -42,8 +48,6 @@ class StoryboardCore {
     parent.spotLightVisible = false;
     this.parent.applyState();
     await this.parent.save();
-
-    // await _saveAllGraphScreenshot();
   }
 
   StoryboardGraph? _findGraph(List<String> parentPath) {
