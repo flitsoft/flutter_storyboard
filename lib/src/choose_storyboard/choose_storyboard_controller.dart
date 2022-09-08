@@ -55,8 +55,7 @@ class ChooseStoryBoardController {
     final storyboardFlow = getCiStoryboardFlow();
     if (!isCI()) return;
     StoryboardGraph? graph = view.widget.graphForStoryboard.children
-        .where((element) =>
-            (element.story.runtimeType.toString() == storyboardFlow))
+        .where((element) => (element.storyName == storyboardFlow))
         .firstOrNull;
 
     if (graph == null) {
@@ -75,7 +74,7 @@ class ChooseStoryBoardController {
       MaterialPageRoute(
         builder: (context) => StoryBoard(
           saveRun: saveRun,
-          storyboardFlow: graph.story.runtimeType.toString(),
+          storyboardFlow: graph.storyName,
           translator: view.widget.translator,
           graphForStoryboard: wrap([graph]),
           onMockEmAll: view.widget.onMockEmAll,

@@ -56,7 +56,7 @@ class StoryboardCore {
       final childrenToSearch =
           lastChildFound?.children ?? [this.parent.graphData];
       final childFound = childrenToSearch.firstWhereOrNull(
-        (element) => element.story.runtimeType.toString() == parent,
+        (element) => element.storyName == parent,
       );
       if (childFound == null) return null;
       lastChildFound = childFound;
@@ -114,7 +114,7 @@ class StoryboardCore {
     StoryboardGraph graph, {
     required ResolvedGraphContainer parent,
   }) async {
-    if (graph.story.runtimeType.toString() == "ContainerLoading") {
+    if (graph.storyName == "ContainerLoading") {
       print("breakpoint");
     }
     print("$logTrace Before putOnSpotLight");
@@ -208,7 +208,7 @@ class StoryboardCore {
       graph: graph.hashCode,
       image: img.hashCode,
       relationDescription: graph.relationDescription,
-      graphName: graph.story.runtimeType.toString(),
+      graphName: graph.storyName,
     );
   }
 

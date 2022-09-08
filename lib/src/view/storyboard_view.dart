@@ -246,7 +246,7 @@ class StoryBoardState extends State<StoryBoard> {
                 Row(),
                 if (controller.currentGraph != null) ...[
                   Text(
-                    "${StaticUtils.camelToSentence(controller.currentGraph!.story.runtimeType.toString())}",
+                    "${StaticUtils.camelToSentence(controller.currentGraph!.storyName)}",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,

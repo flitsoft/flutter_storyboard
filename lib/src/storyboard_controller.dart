@@ -469,7 +469,7 @@ class StoryBoardController {
   Future<void> _printReportToCi(String url) async {
     final storyboardGraphFlow = graphData.children.firstOrNull;
     String relationDescription = storyboardGraphFlow?.relationDescription ?? "";
-    String flowName = storyboardGraphFlow?.relationDescription ?? "";
+    String flowName = storyboardGraphFlow?.storyName ?? "";
     ScreenDiffReport diffReport = _generateScreenDiffReport();
     final storyboardComplete = StoryboardComplete(
       imageUrl: url,
