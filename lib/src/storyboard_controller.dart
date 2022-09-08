@@ -467,11 +467,13 @@ class StoryBoardController {
   }
 
   Future<void> _printReportToCi(String url) async {
-    String relationDescription = graphData.relationDescription;
+    final storyboardGraphFlow = graphData.children.firstOrNull;
+    String relationDescription = storyboardGraphFlow?.relationDescription ?? "";
+    String flowName = storyboardGraphFlow?.relationDescription ?? "";
     ScreenDiffReport diffReport = _generateScreenDiffReport();
     final storyboardComplete = StoryboardComplete(
       imageUrl: url,
-      title: relationDescription,
+      title: "[$flowName] $relationDescription",
       showFlowInPullRequest: showFlowInPullRequest,
       screenDiff: diffReport.screenDiff,
       addedCount: diffReport.addedCount,
