@@ -40,27 +40,12 @@ class StoryboardRepository {
     return graphFlowContainer;
   }
 
-  Future<GraphFlowContainer?> readGraphFlowForContainer(
-    String branchName,
-    String storyboardFlow,
-  ) async {
-    final documentData = await _docRoot()
-        .where("branchName", isEqualTo: branchName)
-        .limit(1)
-        .get();
-    final flowContainer = await this.parseGraphFlowReading(documentData);
-    if (flowContainer == null) return null;
-    if (flowContainer.storyboardFlows[storyboardFlow] == null) return null;
-    return flowContainer;
-  }
-
   Future<GraphDataContainer?> readDataContainer(
     String branchName,
     String storyboardFlow, {
     bool deleteIfCorrupted = false,
   }) async {
-    final graphFlowContainer =
-        await this.readGraphFlowForContainer(branchName, storyboardFlow);
+    final graphFlowContainer = await this.readGraphFlow(branchName);
     if (graphFlowContainer == null) {
       return null;
     }
@@ -100,8 +85,7 @@ class StoryboardRepository {
     String branchName,
     String storyboardFlow,
   ) async {
-    final existingDataFlowContainer =
-        await readGraphFlowForContainer(branchName, storyboardFlow);
+    final existingDataFlowContainer = await readGraphFlow(branchName);
     if (existingDataFlowContainer == null) {
       await this.addDataStore(dataStore, branchName, storyboardFlow);
     } else {
