@@ -10,8 +10,7 @@ part 'graph_data_container.freezed.dart';
 class GraphDataContainer with _$GraphDataContainer {
   const GraphDataContainer._();
   const factory GraphDataContainer({
-    @JsonKey() required String id,
-    @JsonKey() required String branchName,
+    @JsonKey() required String storyboardFlow,
     @JsonKey() required String updatedAt,
     @JsonKey() required String data,
   }) = _GraphDataContainer;
@@ -22,7 +21,7 @@ class GraphDataContainer with _$GraphDataContainer {
   factory GraphDataContainer.fromJson(Map<String, dynamic> json) =>
       _$GraphDataContainerFromJson(json);
 
-  static fromJsonOrNull(Map<String, dynamic> json) {
+  static GraphDataContainer? fromJsonOrNull(Map<String, dynamic> json) {
     try {
       return _$GraphDataContainerFromJson(json);
     } catch (e, trace) {

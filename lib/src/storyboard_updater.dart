@@ -9,11 +9,10 @@ class StoryboardUpdater {
     final featureBranch =
         const String.fromEnvironment(STORYBOARD_FEATURE_BRANCH_NAME);
     final repo = StoryboardRepository();
-    final data = await repo.read(featureBranch);
+    final data = await repo.readGraphFlow(featureBranch);
     if (data == null) return;
-    final dataStore = data.dataStore();
-    if (dataStore == null) return;
-    await repo.saveDatastore(dataStore, baseBranch);
+    final newData = data.copyWith(branchName: baseBranch);
+    await repo.saveGraphFlow(newData);
     RunnerMessenger.sendMessage(BASE_BRANCH_UPDATED, "");
   }
 }

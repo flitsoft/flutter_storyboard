@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_storyboard/src/model/graph_data_container.dart';
+import 'package:flutter_storyboard/src/model/graph_flow_container.dart';
 import 'package:flutter_storyboard/src/model/resolved_storyboard_data_store.dart';
 import 'package:flutter_storyboard/src/utils/internal_utils.dart';
 // import first or null
@@ -15,53 +16,133 @@ class StoryboardRepository {
         .collection('datastore');
   }
 
-  Future<GraphDataContainer?> read(String branchName) async {
+  Future<GraphFlowContainer?> readGraphFlow(
+    String branchName,
+  ) async {
     final documentData = await _docRoot()
         .where("branchName", isEqualTo: branchName)
         .limit(1)
         .get();
+
+    return await this.parseGraphFlowReading(documentData);
+  }
+
+  Future<GraphFlowContainer?> parseGraphFlowReading(
+      QuerySnapshot<Map<String, dynamic>> documentData) async {
     final json = documentData.docs.firstOrNull;
-    // if(json == null) return;
 
     if (json == null) return null;
-    return GraphDataContainer.fromJsonOrNull(json.data());
+    final graphFlowContainer = GraphFlowContainer.fromJsonOrNull(json.data());
+    if (graphFlowContainer == null) {
+      await json.reference.delete();
+      return null;
+    }
+    return graphFlowContainer;
   }
 
-  Future<void> updateDatastore(GraphDataContainer data) async {
+  Future<GraphFlowContainer?> readGraphFlowForContainer(
+    String branchName,
+    String storyboardFlow,
+  ) async {
+    final documentData = await _docRoot()
+        .where("branchName", isEqualTo: branchName)
+        .where("storyboardFlows.$storyboardFlow", isNull: false)
+        .limit(1)
+        .get();
+    return await this.parseGraphFlowReading(documentData);
+  }
+
+  Future<GraphDataContainer?> readDataContainer(
+    String branchName,
+    String storyboardFlow, {
+    bool deleteIfCorrupted = false,
+  }) async {
+    final graphFlowContainer =
+        await this.readGraphFlowForContainer(branchName, storyboardFlow);
+    if (graphFlowContainer == null) {
+      return null;
+    }
+    final graphDataContainer =
+        extractStoryboardFlow(graphFlowContainer, storyboardFlow);
+    return graphDataContainer;
+  }
+
+  GraphDataContainer? extractStoryboardFlow(
+      GraphFlowContainer graphFlowContainer, String storyboardFlow) {
+    final graphDataContainerData =
+        graphFlowContainer.storyboardFlows[storyboardFlow];
+    if (graphDataContainerData == null) {
+      return null;
+    }
+    final graphDataContainer =
+        GraphDataContainer.fromJsonOrNull(graphDataContainerData);
+    if (graphDataContainer == null) {
+      return null;
+    }
+    return graphDataContainer;
+  }
+
+  Future<void> updateDatastore(
+      GraphFlowContainer flow, GraphDataContainer data) async {
     print('$logTrace Updating Data Store ${jsonEncode(data.toJson())}');
     final newData = data.copyWith(updatedAt: DateTime.now().toIso8601String());
-    await _docRoot().doc(data.id).update(newData.toJson());
+    await _docRoot()
+        .doc(flow.id)
+        .update({"storyboardFlows.${data.storyboardFlow}": newData.toJson()});
   }
 
+  // Save if not exist
+  // Otherwise update the existing one
   Future<void> saveDatastore(
     GraphDataStore dataStore,
     String branchName,
+    String storyboardFlow,
   ) async {
-    final existingData = await read(branchName);
-    if (existingData == null) {
-      await this.addDataStore(dataStore, branchName);
+    final existingDataFlowContainer =
+        await readGraphFlowForContainer(branchName, storyboardFlow);
+    if (existingDataFlowContainer == null) {
+      await this.addDataStore(dataStore, branchName, storyboardFlow);
     } else {
-      final newData = existingData.copyWith(
-        data: dataStore.serialize(),
-        updatedAt: DateTime.now().toIso8601String(),
-      );
-      await this.updateDatastore(newData);
+      final existingDataContainer =
+          extractStoryboardFlow(existingDataFlowContainer, storyboardFlow);
+      final newData = existingDataContainer?.copyWith(
+            data: dataStore.serialize(),
+            updatedAt: DateTime.now().toIso8601String(),
+          ) ??
+          createNewData(storyboardFlow, dataStore);
+      await this.updateDatastore(existingDataFlowContainer, newData);
     }
   }
 
   Future<void> addDataStore(
     GraphDataStore dataStore,
     String branchName,
+    String storyboardFlow,
   ) async {
+    final data = createNewData(storyboardFlow, dataStore);
     final id = _generateId(branchName);
-    final data = GraphDataContainer(
+    final graphDataFlow = GraphFlowContainer(
       id: id,
-      data: dataStore.serialize(),
       branchName: branchName,
+      storyboardFlows: {
+        storyboardFlow: data.toJson(),
+      },
       updatedAt: DateTime.now().toIso8601String(),
     );
-    print('$logTrace Saving Data Store ${data.toJson()}');
-    await _docRoot().doc(data.id).set(data.toJson());
+    print('$logTrace Saving Data Store ${graphDataFlow.toJson()}');
+    await this.saveGraphFlow(graphDataFlow);
+  }
+
+  GraphDataContainer createNewData(
+    String storyboardFlow,
+    GraphDataStore dataStore,
+  ) {
+    final data = GraphDataContainer(
+      storyboardFlow: storyboardFlow,
+      data: dataStore.serialize(),
+      updatedAt: DateTime.now().toIso8601String(),
+    );
+    return data;
   }
 
   // firebase id sanitizer
@@ -69,5 +150,9 @@ class StoryboardRepository {
     final id = branchName.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_');
     final now = DateTime.now();
     return '${id}_${now.toIso8601String()}';
+  }
+
+  Future<void> saveGraphFlow(GraphFlowContainer graphDataFlow) async {
+    await _docRoot().doc(graphDataFlow.id).set(graphDataFlow.toJson());
   }
 }

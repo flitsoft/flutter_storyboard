@@ -361,7 +361,11 @@ class StoryBoardController {
       featureBranch =
           const String.fromEnvironment(STORYBOARD_FEATURE_BRANCH_NAME);
     }
-    await storyboardRepo.saveDatastore(data, featureBranch);
+    await storyboardRepo.saveDatastore(
+      data,
+      featureBranch,
+      this.view.widget.storyboardFlow,
+    );
   }
 
   Future<GraphDataStore?> _recurseGraphRootLocalToDataStore(
@@ -403,7 +407,8 @@ class StoryBoardController {
       branch = const String.fromEnvironment(STORYBOARD_BASE_BRANCH_NAME,
           defaultValue: "master");
     }
-    final datastore = await storyboardRepo.read(branch);
+    final datastore = await storyboardRepo.readDataContainer(
+        branch, this.view.widget.storyboardFlow);
     print("$logTrace reading datastore ${datastore?.toJson()}");
     this.graphStoreData = datastore?.dataStore();
   }

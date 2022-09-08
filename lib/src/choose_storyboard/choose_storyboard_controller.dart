@@ -5,6 +5,8 @@ import 'package:flutter_storyboard/src/model/storyboard_model.dart';
 import 'package:flutter_storyboard/src/utils/util.dart';
 import 'package:flutter_storyboard/src/utils/web/google_maps_snapshot.dart';
 import 'package:flutter_storyboard/src/view/storyboard_view.dart';
+// first or null
+import 'package:collection/collection.dart';
 
 class ContainerStoryScreen extends BaseStoryScreen implements StoryScreen {
   late Widget widget;
@@ -37,47 +39,50 @@ class ChooseStoryBoardController {
   }
 
   void onStoryboardRunTapped() {
-    Navigator.push(
+    final graph = view.widget.graphForStoryboard.children
+        .where((element) => element.enabled)
+        .firstOrNull;
+    if (graph == null) {
+      print("No storyboard selected");
+      return;
+    }
+    this.runGraph(graph, saveRun);
+  }
+
+  // Init state for CI
+  // Manual run require to hit button
+  Future<void> initState() async {
+    final storyboardFlow = getCiStoryboardFlow();
+    if (!isCI()) return;
+    StoryboardGraph? graph = view.widget.graphForStoryboard.children
+        .where((element) =>
+            (element.story.runtimeType.toString() == storyboardFlow))
+        .firstOrNull;
+
+    if (graph == null) {
+      print("Could not find storyboard flow $storyboardFlow");
+      return;
+    }
+    await this.runGraph(graph, true);
+  }
+
+  Future<void> runGraph(StoryboardGraph graph, bool saveRun) async {
+    print("[CI] running $graph storyboard flows "
+        "with ${graph.story.runtimeType}");
+
+    await Navigator.push(
       view.context,
       MaterialPageRoute(
-        builder: (BuildContext context) => StoryBoard(
+        builder: (context) => StoryBoard(
           saveRun: saveRun,
+          storyboardFlow: graph.story.runtimeType.toString(),
           translator: view.widget.translator,
+          graphForStoryboard: wrap([graph]),
           onMockEmAll: view.widget.onMockEmAll,
-          graphForStoryboard: wrap(view.widget.graphForStoryboard.children),
           widgetParent: view.widget.widgetParent,
         ),
       ),
     );
-  }
-
-  Future<void> initState() async {
-    final storyboardFlow = getCiStoryboardFlow();
-    if (!isCI()) return;
-    List<StoryboardGraph> storyBoardGraphFlow = view
-        .widget.graphForStoryboard.children
-        .where((element) =>
-            (element.story.runtimeType.toString() == storyboardFlow) ||
-            storyboardFlow == "all")
-        .toList();
-
-    print("[CI] running ${storyBoardGraphFlow.length} storyboard flows "
-        "with ${storyBoardGraphFlow.map((e) => e.story.runtimeType)}");
-
-    for (final StoryboardGraph graph in storyBoardGraphFlow) {
-      await Navigator.push(
-        view.context,
-        MaterialPageRoute(
-          builder: (context) => StoryBoard(
-            saveRun: true,
-            translator: view.widget.translator,
-            graphForStoryboard: wrap([graph]),
-            onMockEmAll: view.widget.onMockEmAll,
-            widgetParent: view.widget.widgetParent,
-          ),
-        ),
-      );
-    }
     GoogleMapsWebScreenshot.instance.exit();
   }
 
@@ -85,7 +90,14 @@ class ChooseStoryBoardController {
     if (value == null) return;
     List<StoryboardGraph> listStoryboardGraph =
         view.widget.graphForStoryboard.children;
-    listStoryboardGraph.elementAt(index).enabled = value;
+    // forEach loop with index
+    listStoryboardGraph.asMap().forEach((i, e) {
+      if (i == index) {
+        e.enabled = value;
+      } else {
+        e.enabled = false;
+      }
+    });
     view.applyState();
   }
 

@@ -18,6 +18,21 @@ class MockStoryboardController extends StoryBoardController {
   }
 
   @override
+  Future<void> save() async {
+    print("Mocked save");
+  }
+
+  @override
+  Future<void> readDataStore() async {
+    print("Mocked readDataStore");
+  }
+
+  @override
+  Future<String?> computeImageHash(ImageWidgetData imageLocal) async {
+    print("Mocked computeImageHash");
+  }
+
+  @override
   Future<ResolvedGraphFromBuild?> putOnSpotLight(StoryboardGraph graph) async {
     return core.resolveGraph(graph);
   }
@@ -48,110 +63,114 @@ void main() {
         children: [],
       );
       // final core = StoryboardCore(controller);
-      await controller.core.afterReadDataStore();
-      expect(
-        controller.core.resolvedGraphRootToJsonForTest(),
-        {
-          'children': [
-            {
-              'remote': {
-                'graphName': 'ContainerLoading',
-                'relationDescription': 'Root tap tap',
-                'graph': {
-                  'enabled': true,
-                  'showInPullRequest': false,
-                  'storyName': 'ContainerLoading',
-                  'relationDescription': 'Loading',
-                  'children': 0
-                },
-                'image': {
-                  'size': {'width': 411.4, 'height': 740.0}
-                },
-                'imageUrl':
-                    'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
+      await controller.core.onReady();
+      expect(controller.core.resolvedGraphRootToJsonForTest(), {
+        'children': [
+          {
+            'remote': {
+              'graphName': 'ContainerLoading',
+              'relationDescription': 'Root tap tap',
+              'graph': {
+                'enabled': true,
+                'showInPullRequest': false,
+                'storyName': 'ContainerLoading',
+                'relationDescription': 'Loading',
+                'children': 0
               },
-              'children': [
-                {
-                  'remote': {
-                    'graphName': 'SplashPageLoading',
-                    'relationDescription': 'root',
-                    'image': {
-                      'size': {'width': 411.4, 'height': 740.0}
-                    },
-                    'imageUrl':
-                        'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
+              'image': {
+                'size': {'width': 411.4, 'height': 740.0}
+              },
+              'imageUrl':
+                  'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b',
+              'hash': ''
+            },
+            'children': [
+              {
+                'remote': {
+                  'graphName': 'SplashPageLoading',
+                  'relationDescription': 'root',
+                  'image': {
+                    'size': {'width': 411.4, 'height': 740.0}
                   },
-                  'children': [
-                    {
-                      'remote': {
-                        'graphName': 'LanguageSignUpPage',
-                        'relationDescription': 'root tap tap',
-                        'image': {
-                          'size': {'width': 411.4, 'height': 740.0}
-                        },
-                        'imageUrl':
-                            'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
+                  'imageUrl':
+                      'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b',
+                  'hash': ''
+                },
+                'children': [
+                  {
+                    'remote': {
+                      'graphName': 'LanguageSignUpPage',
+                      'relationDescription': 'root tap tap',
+                      'image': {
+                        'size': {'width': 411.4, 'height': 740.0}
                       },
-                      'children': [
-                        {
-                          'remote': {
-                            'graphName': 'ShowMoreLanguageClick',
-                            'relationDescription': 'root tap tap',
-                            'image': {
-                              'size': {'width': 411.4, 'height': 740.0}
-                            },
-                            'imageUrl':
-                                'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
-                          },
-                          'children': []
-                        }
-                      ]
+                      'imageUrl':
+                          'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b',
+                      'hash': ''
                     },
-                    {
-                      'remote': {
-                        'graphName': 'OnBoardingLoading',
-                        'relationDescription': 'root tap tap',
-                        'image': {
-                          'size': {'width': 411.4, 'height': 740.0}
-                        },
-                        'imageUrl':
-                            'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
-                      },
-                      'children': [
-                        {
-                          'remote': {
-                            'graphName': 'DragToConfirmYourDriver',
-                            'relationDescription': 'root tap tap',
-                            'image': {
-                              'size': {'width': 411.4, 'height': 740.0}
-                            },
-                            'imageUrl':
-                                'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
+                    'children': [
+                      {
+                        'remote': {
+                          'graphName': 'ShowMoreLanguageClick',
+                          'relationDescription': 'root tap tap',
+                          'image': {
+                            'size': {'width': 411.4, 'height': 740.0}
                           },
-                          'children': [
-                            {
-                              'remote': {
-                                'graphName': 'DragToTrackYourRide',
-                                'relationDescription': 'root tap tap',
-                                'image': {
-                                  'size': {'width': 411.4, 'height': 740.0}
-                                },
-                                'imageUrl':
-                                    'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
+                          'imageUrl':
+                              'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b',
+                          'hash': ''
+                        },
+                        'children': []
+                      }
+                    ]
+                  },
+                  {
+                    'remote': {
+                      'graphName': 'OnBoardingLoading',
+                      'relationDescription': 'root tap tap',
+                      'image': {
+                        'size': {'width': 411.4, 'height': 740.0}
+                      },
+                      'imageUrl':
+                          'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b',
+                      'hash': ''
+                    },
+                    'children': [
+                      {
+                        'remote': {
+                          'graphName': 'DragToConfirmYourDriver',
+                          'relationDescription': 'root tap tap',
+                          'image': {
+                            'size': {'width': 411.4, 'height': 740.0}
+                          },
+                          'imageUrl':
+                              'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b',
+                          'hash': ''
+                        },
+                        'children': [
+                          {
+                            'remote': {
+                              'graphName': 'DragToTrackYourRide',
+                              'relationDescription': 'root tap tap',
+                              'image': {
+                                'size': {'width': 411.4, 'height': 740.0}
                               },
-                              'children': []
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-      );
+                              'imageUrl':
+                                  'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b',
+                              'hash': ''
+                            },
+                            'children': []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      });
     },
   );
 
@@ -197,20 +216,6 @@ void main() {
     expect(controller.core.resolvedGraphRootToJsonForTest(), {
       'children': [
         {
-          'local': {
-            'graphName': 'ContainerLoading',
-            'relationDescription': 'Loading',
-            'graph': {
-              'enabled': true,
-              'showInPullRequest': false,
-              'storyName': 'ContainerLoading',
-              'relationDescription': 'Loading',
-              'children': 1
-            },
-            'image': {
-              'size': {'width': 13.0, 'height': 14.0}
-            }
-          },
           'remote': {
             'graphName': 'ContainerLoading',
             'relationDescription': 'Root tap tap',
@@ -225,24 +230,11 @@ void main() {
               'size': {'width': 411.4, 'height': 740.0}
             },
             'imageUrl':
-                'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
+                'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b',
+            'hash': ''
           },
           'children': [
             {
-              'local': {
-                'graphName': 'SplashPageLoading',
-                'relationDescription': 'Splash screen',
-                'graph': {
-                  'enabled': true,
-                  'showInPullRequest': false,
-                  'storyName': 'SplashPageLoading',
-                  'relationDescription': 'Splash screen',
-                  'children': 2
-                },
-                'image': {
-                  'size': {'width': 13.0, 'height': 14.0}
-                }
-              },
               'remote': {
                 'graphName': 'SplashPageLoading',
                 'relationDescription': 'root',
@@ -257,24 +249,11 @@ void main() {
                   'size': {'width': 411.4, 'height': 740.0}
                 },
                 'imageUrl':
-                    'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
+                    'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b',
+                'hash': ''
               },
               'children': [
                 {
-                  'local': {
-                    'graphName': 'LanguageSignUpPage',
-                    'relationDescription': 'Language SignUp Page',
-                    'graph': {
-                      'enabled': true,
-                      'showInPullRequest': false,
-                      'storyName': 'LanguageSignUpPage',
-                      'relationDescription': 'Language SignUp Page',
-                      'children': 1
-                    },
-                    'image': {
-                      'size': {'width': 13.0, 'height': 14.0}
-                    }
-                  },
                   'remote': {
                     'graphName': 'LanguageSignUpPage',
                     'relationDescription': 'root tap tap',
@@ -289,24 +268,11 @@ void main() {
                       'size': {'width': 411.4, 'height': 740.0}
                     },
                     'imageUrl':
-                        'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
+                        'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b',
+                    'hash': ''
                   },
                   'children': [
                     {
-                      'local': {
-                        'graphName': 'ShowMoreLanguageClick',
-                        'relationDescription': 'Show more Language',
-                        'graph': {
-                          'enabled': true,
-                          'showInPullRequest': false,
-                          'storyName': 'ShowMoreLanguageClick',
-                          'relationDescription': 'Show more Language',
-                          'children': 0
-                        },
-                        'image': {
-                          'size': {'width': 13.0, 'height': 14.0}
-                        }
-                      },
                       'remote': {
                         'graphName': 'ShowMoreLanguageClick',
                         'relationDescription': 'root tap tap',
@@ -321,27 +287,14 @@ void main() {
                           'size': {'width': 411.4, 'height': 740.0}
                         },
                         'imageUrl':
-                            'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
+                            'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b',
+                        'hash': ''
                       },
                       'children': []
                     }
                   ]
                 },
                 {
-                  'local': {
-                    'graphName': 'OnBoardingLoading',
-                    'relationDescription': 'OnBoardingPage screen',
-                    'graph': {
-                      'enabled': true,
-                      'showInPullRequest': false,
-                      'storyName': 'OnBoardingLoading',
-                      'relationDescription': 'OnBoardingPage screen',
-                      'children': 1
-                    },
-                    'image': {
-                      'size': {'width': 13.0, 'height': 14.0}
-                    }
-                  },
                   'remote': {
                     'graphName': 'OnBoardingLoading',
                     'relationDescription': 'root tap tap',
@@ -356,24 +309,11 @@ void main() {
                       'size': {'width': 411.4, 'height': 740.0}
                     },
                     'imageUrl':
-                        'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
+                        'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b',
+                    'hash': ''
                   },
                   'children': [
                     {
-                      'local': {
-                        'graphName': 'DragToConfirmYourDriver',
-                        'relationDescription': 'Drag To Confirm Your Driver',
-                        'graph': {
-                          'enabled': true,
-                          'showInPullRequest': false,
-                          'storyName': 'DragToConfirmYourDriver',
-                          'relationDescription': 'Drag To Confirm Your Driver',
-                          'children': 1
-                        },
-                        'image': {
-                          'size': {'width': 13.0, 'height': 14.0}
-                        }
-                      },
                       'remote': {
                         'graphName': 'DragToConfirmYourDriver',
                         'relationDescription': 'root tap tap',
@@ -388,24 +328,11 @@ void main() {
                           'size': {'width': 411.4, 'height': 740.0}
                         },
                         'imageUrl':
-                            'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
+                            'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b',
+                        'hash': ''
                       },
                       'children': [
                         {
-                          'local': {
-                            'graphName': 'DragToTrackYourRide',
-                            'relationDescription': 'Drag To Track Your Ride',
-                            'graph': {
-                              'enabled': true,
-                              'showInPullRequest': false,
-                              'storyName': 'DragToTrackYourRide',
-                              'relationDescription': 'Drag To Track Your Ride',
-                              'children': 0
-                            },
-                            'image': {
-                              'size': {'width': 13.0, 'height': 14.0}
-                            }
-                          },
                           'remote': {
                             'graphName': 'DragToTrackYourRide',
                             'relationDescription': 'root tap tap',
@@ -420,7 +347,8 @@ void main() {
                               'size': {'width': 411.4, 'height': 740.0}
                             },
                             'imageUrl':
-                                'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
+                                'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b',
+                            'hash': ''
                           },
                           'children': []
                         }
@@ -468,198 +396,124 @@ void main() {
     );
     // final core = StoryboardCore(controller);
     await controller.core.onReady();
-    expect(
-        (controller.core.resolvedGraphRootToJsonForTest()),
-        ({
+    expect((controller.core.resolvedGraphRootToJsonForTest()), {
+      'children': [
+        {
+          'remote': {
+            'graphName': 'ContainerLoading',
+            'relationDescription': 'Root tap tap',
+            'graph': {
+              'enabled': true,
+              'showInPullRequest': false,
+              'storyName': 'ContainerLoading',
+              'relationDescription': 'Loading',
+              'children': 1
+            },
+            'image': {
+              'size': {'width': 411.4, 'height': 740.0}
+            },
+            'imageUrl':
+                'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b',
+            'hash': ''
+          },
           'children': [
             {
-              'local': {
-                'graphName': 'ContainerLoading',
-                'relationDescription': 'Loading',
-                'graph': {
-                  'enabled': true,
-                  'showInPullRequest': false,
-                  'storyName': 'ContainerLoading',
-                  'relationDescription': 'Loading',
-                  'children': 1
-                },
-                'image': {
-                  'size': {'width': 13.0, 'height': 14.0}
-                }
-              },
               'remote': {
-                'graphName': 'ContainerLoading',
-                'relationDescription': 'Root tap tap',
+                'graphName': 'SplashPageLoading',
+                'relationDescription': 'root',
                 'graph': {
                   'enabled': true,
                   'showInPullRequest': false,
-                  'storyName': 'ContainerLoading',
-                  'relationDescription': 'Loading',
+                  'storyName': 'SplashPageLoading',
+                  'relationDescription':
+                      'First child is in local, but local also has a second child that is not here',
                   'children': 1
                 },
                 'image': {
                   'size': {'width': 411.4, 'height': 740.0}
                 },
                 'imageUrl':
-                    'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
+                    'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b',
+                'hash': ''
               },
               'children': [
                 {
-                  'local': {
-                    'graphName': 'SplashPageLoading',
-                    'relationDescription':
-                        'First child is in local, but local also has a second child that is not here',
-                    'graph': {
-                      'enabled': true,
-                      'showInPullRequest': false,
-                      'storyName': 'SplashPageLoading',
-                      'relationDescription':
-                          'First child is in local, but local also has a second child that is not here',
-                      'children': 1
-                    },
-                    'image': {
-                      'size': {'width': 13.0, 'height': 14.0}
-                    }
-                  },
                   'remote': {
-                    'graphName': 'SplashPageLoading',
-                    'relationDescription': 'root',
+                    'graphName': 'LanguageSignUpPage',
+                    'relationDescription': 'root tap tap',
                     'graph': {
                       'enabled': true,
                       'showInPullRequest': false,
-                      'storyName': 'SplashPageLoading',
-                      'relationDescription':
-                          'First child is in local, but local also has a second child that is not here',
-                      'children': 1
+                      'storyName': 'LanguageSignUpPage',
+                      'relationDescription': 'Language SignUp Page',
+                      'children': 2
                     },
                     'image': {
                       'size': {'width': 411.4, 'height': 740.0}
                     },
                     'imageUrl':
-                        'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
+                        'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b',
+                    'hash': ''
                   },
                   'children': [
                     {
-                      'local': {
-                        'graphName': 'LanguageSignUpPage',
-                        'relationDescription': 'Language SignUp Page',
-                        'graph': {
-                          'enabled': true,
-                          'showInPullRequest': false,
-                          'storyName': 'LanguageSignUpPage',
-                          'relationDescription': 'Language SignUp Page',
-                          'children': 2
-                        },
-                        'image': {
-                          'size': {'width': 13.0, 'height': 14.0}
-                        }
-                      },
                       'remote': {
-                        'graphName': 'LanguageSignUpPage',
+                        'graphName': 'ShowMoreLanguageClick',
                         'relationDescription': 'root tap tap',
                         'graph': {
                           'enabled': true,
                           'showInPullRequest': false,
-                          'storyName': 'LanguageSignUpPage',
-                          'relationDescription': 'Language SignUp Page',
-                          'children': 2
+                          'storyName': 'ShowMoreLanguageClick',
+                          'relationDescription': 'Show more Language',
+                          'children': 0
                         },
                         'image': {
                           'size': {'width': 411.4, 'height': 740.0}
                         },
                         'imageUrl':
-                            'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
+                            'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b',
+                        'hash': ''
                       },
-                      'children': [
-                        {
-                          'local': {
-                            'graphName': 'ShowMoreLanguageClick',
-                            'relationDescription': 'Show more Language',
-                            'graph': {
-                              'enabled': true,
-                              'showInPullRequest': false,
-                              'storyName': 'ShowMoreLanguageClick',
-                              'relationDescription': 'Show more Language',
-                              'children': 0
-                            },
-                            'image': {
-                              'size': {'width': 13.0, 'height': 14.0}
-                            }
-                          },
-                          'remote': {
-                            'graphName': 'ShowMoreLanguageClick',
-                            'relationDescription': 'root tap tap',
-                            'graph': {
-                              'enabled': true,
-                              'showInPullRequest': false,
-                              'storyName': 'ShowMoreLanguageClick',
-                              'relationDescription': 'Show more Language',
-                              'children': 0
-                            },
-                            'image': {
-                              'size': {'width': 411.4, 'height': 740.0}
-                            },
-                            'imageUrl':
-                                'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
-                          },
-                          'children': []
-                        },
-                        {
-                          'local': {
-                            'graphName': 'DragToConfirmYourDriver',
-                            'relationDescription':
-                                'This is from remote but not in local',
-                            'graph': {
-                              'enabled': true,
-                              'showInPullRequest': false,
-                              'storyName': 'DragToConfirmYourDriver',
-                              'relationDescription':
-                                  'This is from remote but not in local',
-                              'children': 0
-                            },
-                            'image': {
-                              'size': {'width': 13.0, 'height': 14.0}
-                            },
-                          },
-                          'children': []
-                        }
-                      ]
+                      'children': []
+                    }
+                  ]
+                },
+                {
+                  'remote': {
+                    'graphName': 'OnBoardingLoading',
+                    'relationDescription': 'root tap tap',
+                    'image': {
+                      'size': {'width': 411.4, 'height': 740.0}
                     },
+                    'imageUrl':
+                        'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b',
+                    'hash': ''
+                  },
+                  'children': [
                     {
                       'remote': {
-                        'graphName': 'OnBoardingLoading',
+                        'graphName': 'DragToConfirmYourDriver',
                         'relationDescription': 'root tap tap',
                         'image': {
                           'size': {'width': 411.4, 'height': 740.0}
                         },
                         'imageUrl':
-                            'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
+                            'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b',
+                        'hash': ''
                       },
                       'children': [
                         {
                           'remote': {
-                            'graphName': 'DragToConfirmYourDriver',
+                            'graphName': 'DragToTrackYourRide',
                             'relationDescription': 'root tap tap',
                             'image': {
                               'size': {'width': 411.4, 'height': 740.0}
                             },
                             'imageUrl':
-                                'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
+                                'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b',
+                            'hash': ''
                           },
-                          'children': [
-                            {
-                              'remote': {
-                                'graphName': 'DragToTrackYourRide',
-                                'relationDescription': 'root tap tap',
-                                'image': {
-                                  'size': {'width': 411.4, 'height': 740.0}
-                                },
-                                'imageUrl':
-                                    'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
-                              },
-                              'children': []
-                            }
-                          ]
+                          'children': []
                         }
                       ]
                     }
@@ -668,11 +522,12 @@ void main() {
               ]
             }
           ]
-        }));
+        }
+      ]
+    });
   });
 
   test("Test no remote", () async {
-    // expect('{"foo":123}', '{"foo":124}');
     final controller = MockStoryboardController();
     controller.graphData = StoryboardGraph(
       story: ContainerLoading(),
@@ -703,302 +558,103 @@ void main() {
     // final core = StoryboardCore(controller);
     await controller.core.onReady();
     expect(
-        (controller.core.resolvedGraphRootToJsonForTest()),
-        ({
-          'children': [
-            {
-              'local': {
-                'graphName': 'ContainerLoading',
+      (controller.core.resolvedGraphRootToJsonForTest()),
+      {
+        'children': [
+          {
+            'local': {
+              'graphName': 'ContainerLoading',
+              'relationDescription': 'Loading',
+              'graph': {
+                'enabled': true,
+                'showInPullRequest': false,
+                'storyName': 'ContainerLoading',
                 'relationDescription': 'Loading',
-                'graph': {
-                  'enabled': true,
-                  'showInPullRequest': false,
-                  'storyName': 'ContainerLoading',
-                  'relationDescription': 'Loading',
-                  'children': 1
-                },
-                'image': {
-                  'size': {'width': 13.0, 'height': 14.0}
-                }
+                'children': 1
               },
-              'children': [
-                {
-                  'local': {
-                    'graphName': 'SplashPageLoading',
+              'image': {
+                'size': {'width': 13.0, 'height': 14.0}
+              }
+            },
+            'children': [
+              {
+                'local': {
+                  'graphName': 'SplashPageLoading',
+                  'relationDescription':
+                      'First child is in local, but local also has a second child that is not here',
+                  'graph': {
+                    'enabled': true,
+                    'showInPullRequest': false,
+                    'storyName': 'SplashPageLoading',
                     'relationDescription':
                         'First child is in local, but local also has a second child that is not here',
-                    'graph': {
-                      'enabled': true,
-                      'showInPullRequest': false,
-                      'storyName': 'SplashPageLoading',
-                      'relationDescription':
-                          'First child is in local, but local also has a second child that is not here',
-                      'children': 1
-                    },
-                    'image': {
-                      'size': {'width': 13.0, 'height': 14.0}
-                    }
+                    'children': 1
                   },
-                  'children': [
-                    {
-                      'local': {
-                        'graphName': 'LanguageSignUpPage',
+                  'image': {
+                    'size': {'width': 13.0, 'height': 14.0}
+                  }
+                },
+                'children': [
+                  {
+                    'local': {
+                      'graphName': 'LanguageSignUpPage',
+                      'relationDescription': 'Language SignUp Page',
+                      'graph': {
+                        'enabled': true,
+                        'showInPullRequest': false,
+                        'storyName': 'LanguageSignUpPage',
                         'relationDescription': 'Language SignUp Page',
-                        'graph': {
-                          'enabled': true,
-                          'showInPullRequest': false,
-                          'storyName': 'LanguageSignUpPage',
-                          'relationDescription': 'Language SignUp Page',
-                          'children': 2
-                        },
-                        'image': {
-                          'size': {'width': 13.0, 'height': 14.0}
-                        }
+                        'children': 2
                       },
-                      'children': [
-                        {
-                          'local': {
-                            'graphName': 'ShowMoreLanguageClick',
+                      'image': {
+                        'size': {'width': 13.0, 'height': 14.0}
+                      }
+                    },
+                    'children': [
+                      {
+                        'local': {
+                          'graphName': 'ShowMoreLanguageClick',
+                          'relationDescription': 'Show more Language',
+                          'graph': {
+                            'enabled': true,
+                            'showInPullRequest': false,
+                            'storyName': 'ShowMoreLanguageClick',
                             'relationDescription': 'Show more Language',
-                            'graph': {
-                              'enabled': true,
-                              'showInPullRequest': false,
-                              'storyName': 'ShowMoreLanguageClick',
-                              'relationDescription': 'Show more Language',
-                              'children': 0
-                            },
-                            'image': {
-                              'size': {'width': 13.0, 'height': 14.0}
-                            }
+                            'children': 0
                           },
-                          'children': []
+                          'image': {
+                            'size': {'width': 13.0, 'height': 14.0}
+                          }
                         },
-                        {
-                          'local': {
-                            'graphName': 'DragToConfirmYourDriver',
+                        'children': []
+                      },
+                      {
+                        'local': {
+                          'graphName': 'DragToConfirmYourDriver',
+                          'relationDescription':
+                              'This is from remote but not in local',
+                          'graph': {
+                            'enabled': true,
+                            'showInPullRequest': false,
+                            'storyName': 'DragToConfirmYourDriver',
                             'relationDescription':
                                 'This is from remote but not in local',
-                            'graph': {
-                              'enabled': true,
-                              'showInPullRequest': false,
-                              'storyName': 'DragToConfirmYourDriver',
-                              'relationDescription':
-                                  'This is from remote but not in local',
-                              'children': 0
-                            },
-                            'image': {
-                              'size': {'width': 13.0, 'height': 14.0}
-                            },
+                            'children': 0
                           },
-                          'children': []
-                        }
-                      ]
-                    },
-                  ]
-                }
-              ]
-            }
-          ]
-        }));
+                          'image': {
+                            'size': {'width': 13.0, 'height': 14.0}
+                          },
+                        },
+                        'children': []
+                      }
+                    ]
+                  },
+                ]
+              }
+            ]
+          }
+        ]
+      },
+    );
   });
 }
-
-final d = {
-  'children': [
-    {
-      'local': {
-        'graphName': 'ContainerLoading',
-        'relationDescription': 'Loading',
-        'graph': {
-          'enabled': true,
-          'showInPullRequest': false,
-          'storyName': 'ContainerLoading',
-          'relationDescription': 'Loading',
-          'children': 1
-        },
-        'image': {
-          'size': {'width': 13.0, 'height': 14.0}
-        }
-      },
-      'remote': {
-        'graphName': 'ContainerLoading',
-        'relationDescription': 'Root tap tap',
-        'graph': {
-          'enabled': true,
-          'showInPullRequest': false,
-          'storyName': 'ContainerLoading',
-          'relationDescription': 'Loading',
-          'children': 1
-        },
-        'image': {
-          'size': {'width': 411.4, 'height': 740.0}
-        },
-        'imageUrl':
-            'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
-      },
-      'children': [
-        {
-          'local': {
-            'graphName': 'SplashPageLoading',
-            'relationDescription':
-                'First child is in local, but local also has a second child that is not here',
-            'graph': {
-              'enabled': true,
-              'showInPullRequest': false,
-              'storyName': 'SplashPageLoading',
-              'relationDescription':
-                  'First child is in local, but local also has a second child that is not here',
-              'children': 1
-            },
-            'image': {
-              'size': {'width': 13.0, 'height': 14.0}
-            }
-          },
-          'remote': {
-            'graphName': 'SplashPageLoading',
-            'relationDescription': 'root',
-            'graph': {
-              'enabled': true,
-              'showInPullRequest': false,
-              'storyName': 'SplashPageLoading',
-              'relationDescription':
-                  'First child is in local, but local also has a second child that is not here',
-              'children': 1
-            },
-            'image': {
-              'size': {'width': 411.4, 'height': 740.0}
-            },
-            'imageUrl':
-                'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
-          },
-          'children': [
-            {
-              'local': {
-                'graphName': 'LanguageSignUpPage',
-                'relationDescription': 'Language SignUp Page',
-                'graph': {
-                  'enabled': true,
-                  'showInPullRequest': false,
-                  'storyName': 'LanguageSignUpPage',
-                  'relationDescription': 'Language SignUp Page',
-                  'children': 2
-                },
-                'image': {
-                  'size': {'width': 13.0, 'height': 14.0}
-                }
-              },
-              'remote': {
-                'graphName': 'LanguageSignUpPage',
-                'relationDescription': 'root tap tap',
-                'graph': {
-                  'enabled': true,
-                  'showInPullRequest': false,
-                  'storyName': 'LanguageSignUpPage',
-                  'relationDescription': 'Language SignUp Page',
-                  'children': 2
-                },
-                'image': {
-                  'size': {'width': 411.4, 'height': 740.0}
-                },
-                'imageUrl':
-                    'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
-              },
-              'children': [
-                {
-                  'local': {
-                    'graphName': 'ShowMoreLanguageClick',
-                    'relationDescription': 'Show more Language',
-                    'graph': {
-                      'enabled': true,
-                      'showInPullRequest': false,
-                      'storyName': 'ShowMoreLanguageClick',
-                      'relationDescription': 'Show more Language',
-                      'children': 0
-                    },
-                    'image': {
-                      'size': {'width': 13.0, 'height': 14.0}
-                    }
-                  },
-                  'remote': {
-                    'graphName': 'ShowMoreLanguageClick',
-                    'relationDescription': 'root tap tap',
-                    'graph': {
-                      'enabled': true,
-                      'showInPullRequest': false,
-                      'storyName': 'ShowMoreLanguageClick',
-                      'relationDescription': 'Show more Language',
-                      'children': 0
-                    },
-                    'image': {
-                      'size': {'width': 411.4, 'height': 740.0}
-                    },
-                    'imageUrl':
-                        'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
-                  },
-                  'children': []
-                },
-                {
-                  'local': {
-                    'graphName': 'DragToConfirmYourDriver',
-                    'relationDescription':
-                        'This is from remote but not in local',
-                    'graph': {
-                      'enabled': true,
-                      'showInPullRequest': false,
-                      'storyName': 'DragToConfirmYourDriver',
-                      'relationDescription':
-                          'This is from remote but not in local',
-                      'children': 0
-                    },
-                    'image': {
-                      'size': {'width': 13.0, 'height': 14.0}
-                    }
-                  },
-                  'children': []
-                }
-              ]
-            },
-            {
-              'remote': {
-                'graphName': 'OnBoardingLoading',
-                'relationDescription': 'root tap tap',
-                'image': {
-                  'size': {'width': 411.4, 'height': 740.0}
-                },
-                'imageUrl':
-                    'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
-              },
-              'children': [
-                {
-                  'remote': {
-                    'graphName': 'DragToConfirmYourDriver',
-                    'relationDescription': 'root tap tap',
-                    'image': {
-                      'size': {'width': 411.4, 'height': 740.0}
-                    },
-                    'imageUrl':
-                        'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
-                  },
-                  'children': [
-                    {
-                      'remote': {
-                        'graphName': 'DragToTrackYourRide',
-                        'relationDescription': 'root tap tap',
-                        'image': {
-                          'size': {'width': 411.4, 'height': 740.0}
-                        },
-                        'imageUrl':
-                            'https://firebasestorage.googleapis.com/v0/b/rideapplication-3aa62.appspot.com/o/Simulator%20Screen%20Shot%20-%20iPhone%2011%20-%202022-06-15%20at%2017.49.30.png?alt=media&token=81563eb3-d5f5-4443-bd6d-88847ffb3e9b'
-                      },
-                      'children': []
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ]
-};

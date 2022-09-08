@@ -21,13 +21,11 @@ class _$GraphDataContainerTearOff {
   const _$GraphDataContainerTearOff();
 
   _GraphDataContainer call(
-      {@JsonKey() required String id,
-      @JsonKey() required String branchName,
+      {@JsonKey() required String storyboardFlow,
       @JsonKey() required String updatedAt,
       @JsonKey() required String data}) {
     return _GraphDataContainer(
-      id: id,
-      branchName: branchName,
+      storyboardFlow: storyboardFlow,
       updatedAt: updatedAt,
       data: data,
     );
@@ -44,9 +42,7 @@ const $GraphDataContainer = _$GraphDataContainerTearOff();
 /// @nodoc
 mixin _$GraphDataContainer {
   @JsonKey()
-  String get id => throw _privateConstructorUsedError;
-  @JsonKey()
-  String get branchName => throw _privateConstructorUsedError;
+  String get storyboardFlow => throw _privateConstructorUsedError;
   @JsonKey()
   String get updatedAt => throw _privateConstructorUsedError;
   @JsonKey()
@@ -64,8 +60,7 @@ abstract class $GraphDataContainerCopyWith<$Res> {
           GraphDataContainer value, $Res Function(GraphDataContainer) then) =
       _$GraphDataContainerCopyWithImpl<$Res>;
   $Res call(
-      {@JsonKey() String id,
-      @JsonKey() String branchName,
+      {@JsonKey() String storyboardFlow,
       @JsonKey() String updatedAt,
       @JsonKey() String data});
 }
@@ -81,19 +76,14 @@ class _$GraphDataContainerCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object? id = freezed,
-    Object? branchName = freezed,
+    Object? storyboardFlow = freezed,
     Object? updatedAt = freezed,
     Object? data = freezed,
   }) {
     return _then(_value.copyWith(
-      id: id == freezed
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      branchName: branchName == freezed
-          ? _value.branchName
-          : branchName // ignore: cast_nullable_to_non_nullable
+      storyboardFlow: storyboardFlow == freezed
+          ? _value.storyboardFlow
+          : storyboardFlow // ignore: cast_nullable_to_non_nullable
               as String,
       updatedAt: updatedAt == freezed
           ? _value.updatedAt
@@ -115,8 +105,7 @@ abstract class _$GraphDataContainerCopyWith<$Res>
       __$GraphDataContainerCopyWithImpl<$Res>;
   @override
   $Res call(
-      {@JsonKey() String id,
-      @JsonKey() String branchName,
+      {@JsonKey() String storyboardFlow,
       @JsonKey() String updatedAt,
       @JsonKey() String data});
 }
@@ -134,19 +123,14 @@ class __$GraphDataContainerCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object? id = freezed,
-    Object? branchName = freezed,
+    Object? storyboardFlow = freezed,
     Object? updatedAt = freezed,
     Object? data = freezed,
   }) {
     return _then(_GraphDataContainer(
-      id: id == freezed
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      branchName: branchName == freezed
-          ? _value.branchName
-          : branchName // ignore: cast_nullable_to_non_nullable
+      storyboardFlow: storyboardFlow == freezed
+          ? _value.storyboardFlow
+          : storyboardFlow // ignore: cast_nullable_to_non_nullable
               as String,
       updatedAt: updatedAt == freezed
           ? _value.updatedAt
@@ -164,8 +148,7 @@ class __$GraphDataContainerCopyWithImpl<$Res>
 @JsonSerializable()
 class _$_GraphDataContainer extends _GraphDataContainer {
   const _$_GraphDataContainer(
-      {@JsonKey() required this.id,
-      @JsonKey() required this.branchName,
+      {@JsonKey() required this.storyboardFlow,
       @JsonKey() required this.updatedAt,
       @JsonKey() required this.data})
       : super._();
@@ -175,10 +158,7 @@ class _$_GraphDataContainer extends _GraphDataContainer {
 
   @override
   @JsonKey()
-  final String id;
-  @override
-  @JsonKey()
-  final String branchName;
+  final String storyboardFlow;
   @override
   @JsonKey()
   final String updatedAt;
@@ -188,18 +168,16 @@ class _$_GraphDataContainer extends _GraphDataContainer {
 
   @override
   String toString() {
-    return 'GraphDataContainer(id: $id, branchName: $branchName, updatedAt: $updatedAt, data: $data)';
+    return 'GraphDataContainer(storyboardFlow: $storyboardFlow, updatedAt: $updatedAt, data: $data)';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other is _GraphDataContainer &&
-            (identical(other.id, id) ||
-                const DeepCollectionEquality().equals(other.id, id)) &&
-            (identical(other.branchName, branchName) ||
+            (identical(other.storyboardFlow, storyboardFlow) ||
                 const DeepCollectionEquality()
-                    .equals(other.branchName, branchName)) &&
+                    .equals(other.storyboardFlow, storyboardFlow)) &&
             (identical(other.updatedAt, updatedAt) ||
                 const DeepCollectionEquality()
                     .equals(other.updatedAt, updatedAt)) &&
@@ -210,8 +188,7 @@ class _$_GraphDataContainer extends _GraphDataContainer {
   @override
   int get hashCode =>
       runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(id) ^
-      const DeepCollectionEquality().hash(branchName) ^
+      const DeepCollectionEquality().hash(storyboardFlow) ^
       const DeepCollectionEquality().hash(updatedAt) ^
       const DeepCollectionEquality().hash(data);
 
@@ -228,8 +205,7 @@ class _$_GraphDataContainer extends _GraphDataContainer {
 
 abstract class _GraphDataContainer extends GraphDataContainer {
   const factory _GraphDataContainer(
-      {@JsonKey() required String id,
-      @JsonKey() required String branchName,
+      {@JsonKey() required String storyboardFlow,
       @JsonKey() required String updatedAt,
       @JsonKey() required String data}) = _$_GraphDataContainer;
   const _GraphDataContainer._() : super._();
@@ -239,10 +215,7 @@ abstract class _GraphDataContainer extends GraphDataContainer {
 
   @override
   @JsonKey()
-  String get id => throw _privateConstructorUsedError;
-  @override
-  @JsonKey()
-  String get branchName => throw _privateConstructorUsedError;
+  String get storyboardFlow => throw _privateConstructorUsedError;
   @override
   @JsonKey()
   String get updatedAt => throw _privateConstructorUsedError;
