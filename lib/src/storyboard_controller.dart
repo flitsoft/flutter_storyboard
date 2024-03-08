@@ -34,6 +34,11 @@ import 'package:get_it/get_it.dart';
 
 import 'storyboard_core.dart';
 
+Future<String> generateImageHash(List<int> bytes) async {
+  String digest = sha256.convert(bytes).toString();
+  return digest;
+}
+
 class StoryBoardController {
   GraphDataStore? graphStoreData;
   late StoryboardCore core = StoryboardCore(this);
@@ -427,10 +432,7 @@ class StoryBoardController {
     this.graphStoreData = datastore?.dataStore();
   }
 
-  Future<String> generateImageHash(List<int> bytes) async {
-    String digest = sha256.convert(bytes).toString();
-    return digest;
-  }
+
 
   Future<String?> computeImageHash(ImageWidgetData imageLocal) async {
     final image = (imageLocal.image as UIImage).image;
