@@ -75,3 +75,6 @@ build/
 !**/ios/**/default.perspectivev3
 .fvm/flutter_sdk
 .idea/workspace.xml
+
+.fvm/
+
