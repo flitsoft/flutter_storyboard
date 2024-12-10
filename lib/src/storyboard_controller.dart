@@ -361,6 +361,7 @@ class StoryBoardController {
         .firstWhereOrNull((element) => element.local != null);
     if (rootLocal == null) return;
     final data = await _recurseGraphRootLocalToDataStore(rootLocal);
+    print('$logTrace after  _recurseGraphRootLocalToDataStore, data $data');
     if (data == null) return;
     String featureBranch = "feature/debug-proxy-charles";
     if (isCI()) {
@@ -460,26 +461,26 @@ class StoryBoardController {
     print(
         "Difference ${graphWithBoth.local.hash == graphWithBoth.remote.hash}");
     return;
-
-    final imageLocal = this.lookupGraphLocale(resolvedGraph)?.image;
-    if (imageLocal == null) return null;
-    final imageRemote = this.lookupGraphRemote(resolvedGraph)?.image;
-    if (imageRemote == null) return null;
-    final image = (imageLocal.image as UIImage).image;
-    final imageBytes = await _convertImageToBytes(image);
-    if (imageBytes == null) return;
-    final start = DateTime.now();
-    // final url = graphWithBoth.remote.imageUrl;
-    // final networkResult = await compareImages(
-    //     src1: imageBytes.toList(),
-    //     src2: imageBytes.toList(),
-    //     algorithm: PixelMatching(ignoreAlpha: true));
-
-    var result = await compute(generateImageHash, imageBytes.toList());
-    var result1 = await compute(generateImageHash, imageBytes.toList());
-    final end = DateTime.now();
-    print(
-        "Difference is $result $result1. Took ${end.millisecondsSinceEpoch - start.millisecondsSinceEpoch}");
+    //
+    // final imageLocal = this.lookupGraphLocale(resolvedGraph)?.image;
+    // if (imageLocal == null) return null;
+    // final imageRemote = this.lookupGraphRemote(resolvedGraph)?.image;
+    // if (imageRemote == null) return null;
+    // final image = (imageLocal.image as UIImage).image;
+    // final imageBytes = await _convertImageToBytes(image);
+    // if (imageBytes == null) return;
+    // final start = DateTime.now();
+    // // final url = graphWithBoth.remote.imageUrl;
+    // // final networkResult = await compareImages(
+    // //     src1: imageBytes.toList(),
+    // //     src2: imageBytes.toList(),
+    // //     algorithm: PixelMatching(ignoreAlpha: true));
+    //
+    // var result = await compute(generateImageHash, imageBytes.toList());
+    // var result1 = await compute(generateImageHash, imageBytes.toList());
+    // final end = DateTime.now();
+    // print(
+    //     "Difference is $result $result1. Took ${end.millisecondsSinceEpoch - start.millisecondsSinceEpoch}");
   }
 
   Future<void> _printReportToCi(String url) async {

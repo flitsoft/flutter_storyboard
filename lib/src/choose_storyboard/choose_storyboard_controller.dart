@@ -89,14 +89,20 @@ class ChooseStoryBoardController {
     if (value == null) return;
     List<StoryboardGraph> listStoryboardGraph =
         view.widget.graphForStoryboard.children;
-    // forEach loop with index
-    listStoryboardGraph.asMap().forEach((i, e) {
-      if (i == index) {
-        e.enabled = value;
-      } else {
-        e.enabled = false;
-      }
-    });
+    listStoryboardGraph.elementAt(index).enabled = value;
+    view.applyState();
+    //
+    // if (value == null) return;
+    // List<StoryboardGraph> listStoryboardGraph =
+    //     view.widget.graphForStoryboard.children;
+    // // forEach loop with index
+    // listStoryboardGraph.asMap().forEach((i, e) {
+    //   if (i == index) {
+    //     e.enabled = value;
+    //   } else {
+    //     e.enabled = false;
+    //   }
+    // });
     view.applyState();
   }
 
