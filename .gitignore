@@ -78,3 +78,6 @@ build/
 
 .fvm/
 
+
+node_modules/
+
